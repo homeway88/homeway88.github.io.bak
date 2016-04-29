@@ -1,0 +1,393 @@
+<!doctype html>
+<!--[if lt IE 7]><html class="no-js lt-ie9 lt-ie8 lt-ie7" lang="en"> <![endif]-->
+<!--[if (IE 7)&!(IEMobile)]><html class="no-js lt-ie9 lt-ie8" lang="en"><![endif]-->
+<!--[if (IE 8)&!(IEMobile)]><html class="no-js lt-ie9" lang="en"><![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en"><!--<![endif]-->
+<head>
+<meta charset="utf-8">
+<title>Scala中的字符串操作与自定义扩展 &#8211; Homeway's Blog</title>
+<meta name="description" content="Homeway's Blog">
+<meta name="keywords" content="Scala, 字符串">
+
+<!-- Twitter Cards -->
+<meta name="twitter:card" content="summary">
+<meta name="twitter:site" content="@homeway88">
+<meta name="twitter:creator" content="@homeway88">
+
+<!-- Open Graph -->
+<meta property="og:locale" content="zh_CN">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Scala中的字符串操作与自定义扩展">
+<meta property="og:description" content="Homeway's Blog">
+<meta property="og:url" content="http://www.coderblog.cn/scala/string-manipulation-and-interpolation-in-scala/">
+<meta property="og:site_name" content="Homeway's Blog">
+<meta property="og:image" content="http://www.coderblog.cn/images/">
+
+
+
+
+
+<link rel="canonical" href="http://www.coderblog.cn/scala/string-manipulation-and-interpolation-in-scala/">
+<link href="http://www.coderblog.cn/feed.xml" type="application/atom+xml" rel="alternate" title="Homeway's Blog Feed">
+
+<!-- http://t.co/dKP3o1e -->
+<meta name="HandheldFriendly" content="True">
+<meta name="MobileOptimized" content="320">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0, user-scalable=no"/>
+
+<!-- For all browsers -->
+<link rel="stylesheet" href="http://www.coderblog.cn/assets/css/main.css">
+<link rel="stylesheet" href="http://www.coderblog.cn/assets/css/jquery.mmenu.all.css">
+<link rel="stylesheet" href="http://www.coderblog.cn/assets/css/jquery.floating-social-share.min.css">
+<!-- Webfonts -->
+<link href="//fonts.googleapis.com/css?family=Lato:300,400,700,300italic,400italic" rel="stylesheet" type="text/css">
+
+<meta http-equiv="cleartype" content="on">
+
+<!-- Load Modernizr -->
+<script type="text/javascript" src="http://www.coderblog.cn/assets/js/vendor/modernizr-2.6.2.custom.min.js"></script>
+
+<!-- Icons -->
+<!-- 16x16 -->
+<link rel="shortcut icon" href="http://www.coderblog.cn/favicon.ico">
+<!-- 32x32 -->
+<link rel="shortcut icon" href="http://www.coderblog.cn/favicon.png">
+<!-- 57x57 (precomposed) for iPhone 3GS, pre-2011 iPod Touch and older Android devices -->
+<link rel="apple-touch-icon-precomposed" href="http://www.coderblog.cn/images/apple-touch-icon-precomposed.png">
+<!-- 72x72 (precomposed) for 1st generation iPad, iPad 2 and iPad mini -->
+<link rel="apple-touch-icon-precomposed" sizes="72x72" href="http://www.coderblog.cn/images/apple-touch-icon-72x72-precomposed.png">
+<!-- 114x114 (precomposed) for iPhone 4, 4S, 5 and post-2011 iPod Touch -->
+<link rel="apple-touch-icon-precomposed" sizes="114x114" href="http://www.coderblog.cn/images/apple-touch-icon-114x114-precomposed.png">
+<!-- 144x144 (precomposed) for iPad 3rd and 4th generation -->
+<link rel="apple-touch-icon-precomposed" sizes="144x144" href="http://www.coderblog.cn/images/apple-touch-icon-144x144-precomposed.png">
+
+
+
+
+</head>
+
+<body id="post" >
+
+<!--[if lt IE 9]><div class="upgrade"><strong><a href="http://whatbrowser.org/">Your browser is quite old!</strong> Why not upgrade to a different browser to better enjoy this site?</a></div><![endif]-->
+
+
+
+<div class="header-menu header-menu-top">
+    <ul class="header-item-container">
+      <li class="header-item-title header-toggle "><a href="#menu"><h2><i class="fa fa-bars"></i></h2></a></li>
+      <li class="header-item-title">
+        <a href="http://www.coderblog.cn/">
+          
+          <a href="http://www.coderblog.cn/" class="title"> Homeway's Blog</a>
+        </a>
+      </li>
+      
+        
+        
+
+        
+            
+                <li class="header-item "><a href="http://www.coderblog.cn/about"><h3>关于我</h3></a></li>
+            
+        
+      
+        
+        
+
+        
+          <li class="header-item "><a href="http://www.coderblog.cn/categories"><h3>分类</h3></a>
+            <ul class="header-submenu">
+              
+                
+                  <li class="sub-item"><a href="/categories/#scala">scala</a></li>
+              
+            </ul>
+          </li>
+        
+      
+        
+        
+
+        
+            
+                <li class="header-item "><a href="http://www.coderblog.cn/tags"><h3>标签</h3></a></li>
+            
+        
+      
+        
+        
+
+        
+            
+                <li class="header-item "><a href="http://www.coderblog.cn/"><h3>主页</h3></a></li>
+            
+        
+      
+      
+    </ul>
+  </div>
+<div class="entry-header">
+  <div class="header-title">
+    <div class="header-title-wrap">
+      <h1>Scala中的字符串操作与自定义扩展</h1>
+      
+        <h2><span class="entry-date date published updated"><time datetime="2016-05-03T00:00:00+08:00">May 03, 2016</time></span></h2>
+      
+
+      
+        <p class="entry-reading-time">
+          <i class="fa fa-clock-o"></i>
+          
+          Reading time ~1 minute
+        </p><!-- /.entry-reading-time -->
+      
+    </div><!-- /.header-title-wrap -->
+  </div><!-- /.header-title -->
+</div><!-- /.entry-header -->
+
+
+<nav id="menu" style="display: none">
+  <ul>
+    
+      
+        <li><a href="http://www.coderblog.cn/"><h3>主页</h3></a></li>
+      
+    
+      
+        <li><a href="http://www.coderblog.cn/tags"><h3>标签</h3></a></li>
+      
+    
+      
+        <li><a href="http://www.coderblog.cn/categories"><h3>分类</h3></a>
+          <ul>
+            
+              
+                <li><a href="http://www.coderblog.cn/categories/#scala">scala</a></li>
+            
+          </ul>
+        </li>
+      
+    
+      
+        <li><a href="http://www.coderblog.cn/about"><h3>关于我</h3></a></li>
+      
+    
+  </ul>
+</nav>
+
+
+  <a href="https://twitter.com/homeway88" class="btn btn-info button-twitter" data-show-count="false" data-size="large"><i class="fa fa-twitter"></i> <span> | Follow @homeway88</span></a>
+
+
+
+<div id="main" role="main">
+  <article class="hentry">
+    <div class="entry-content">
+        
+      <h1 class="post-title entry-title">Scala中的字符串操作与自定义扩展</h1>
+      <p>Scala中的String本质上只是<code>java.lang.String</code>的一个引用，但是Scala通过<code>StringOps</code>和<code>StringContext</code>来扩展了String类型的操作。</p>
+
+<!-- more -->
+
+<h2 id="string">1. String的本质</h2>
+<p>Scala中的<code>String</code>类型，只是<code>java.lang.String</code>类型的一个引用，在<code>Scala.Predef</code>对象中是这样定义的：<code>type String = java.lang.String</code>,因此，java中所有的字符串操作函数，在scala中都支持。在此基础上，scala也对String类型进行了扩展，以支持更多的操作。主要是由特质<code>StringLike</code>和实现该特质的类<code>StringOps</code>来实现的，在<code>String</code>对象需要进行扩展操作时，会被隐式转换为<code>StringOps</code>类型。</p>
+
+<h2 id="section">2. 字符串的常用操作</h2>
+<ul>
+  <li>字符串重复</li>
+  <li>大小写转换与首字母大写</li>
+  <li>字符串拼接</li>
+  <li>类型转换，其中需要注意的是<code>toBoolean</code>,要求字符串转为小写后必须为<code>"true"</code>或者<code>"false"</code>,否则会出错。</li>
+  <li>字符串分割与组装：利用正式表达式分隔符来对字符串进行分割；而组装则是将多个字符串通过分隔符来组装成一个字符串,另外，还可以定义头部和尾部。</li>
+</ul>
+
+<div class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="c1">//字符串重复
+</span><span class="n">assert</span><span class="o">(</span><span class="s">"Love "</span> <span class="o">*</span> <span class="mi">3</span> <span class="o">==</span> <span class="s">"Love Love Love "</span><span class="o">)</span>
+
+<span class="c1">//大小写转换
+</span><span class="n">assert</span><span class="o">(</span><span class="s">"abc"</span><span class="o">.</span><span class="n">toUpperCase</span> <span class="o">==</span> <span class="s">"ABC"</span><span class="o">)</span>
+<span class="n">assert</span><span class="o">(</span><span class="s">"ABC"</span><span class="o">.</span><span class="n">toLowerCase</span> <span class="o">==</span> <span class="s">"abc"</span><span class="o">)</span>
+<span class="n">assert</span><span class="o">(</span><span class="s">"abc"</span><span class="o">.</span><span class="n">capitalize</span> <span class="o">==</span> <span class="s">"Abc"</span><span class="o">)</span>
+
+<span class="c1">//字符串拼接
+</span><span class="n">assert</span><span class="o">(</span><span class="s">"coderblog"</span><span class="o">.</span><span class="n">concat</span><span class="o">(</span><span class="s">".cn"</span><span class="o">)</span> <span class="o">==</span> <span class="s">"coderblog"</span> <span class="o">+</span> <span class="s">".cn"</span><span class="o">)</span>
+
+<span class="c1">//类型转换
+</span><span class="n">assert</span><span class="o">(</span><span class="s">"true"</span><span class="o">.</span><span class="n">toBoolean</span> <span class="o">==</span> <span class="kc">true</span><span class="o">)</span>
+<span class="n">assert</span><span class="o">(</span><span class="s">"32"</span><span class="o">.</span><span class="n">toByte</span> <span class="o">==</span> <span class="mi">32</span><span class="o">)</span>
+<span class="n">assert</span><span class="o">(</span><span class="s">"127"</span><span class="o">.</span><span class="n">toShort</span> <span class="o">==</span> <span class="mi">127</span><span class="o">)</span>
+<span class="n">assert</span><span class="o">(</span><span class="s">"127"</span><span class="o">.</span><span class="n">toInt</span> <span class="o">==</span> <span class="mi">127</span><span class="o">)</span>
+<span class="n">assert</span><span class="o">(</span><span class="s">"127"</span><span class="o">.</span><span class="n">toLong</span> <span class="o">==</span> <span class="mi">127</span><span class="o">)</span>
+<span class="n">assert</span><span class="o">(</span><span class="s">"1.0"</span><span class="o">.</span><span class="n">toFloat</span> <span class="o">==</span> <span class="mf">1.0f</span><span class="o">)</span>
+<span class="n">assert</span><span class="o">(</span><span class="s">"1.0"</span><span class="o">.</span><span class="n">toDouble</span> <span class="o">==</span> <span class="mf">1.0d</span><span class="o">)</span>
+
+<span class="c1">//字符串分割与组装
+</span><span class="n">assert</span><span class="o">(</span><span class="s">"www.coderblog.cn"</span><span class="o">.</span><span class="n">split</span><span class="o">(</span><span class="s">"\\."</span><span class="o">).</span><span class="n">toList</span> <span class="o">==</span> <span class="nc">List</span><span class="o">(</span><span class="s">"www"</span><span class="o">,</span><span class="s">"coderblog"</span><span class="o">,</span><span class="s">"cn"</span><span class="o">))</span>
+<span class="n">assert</span><span class="o">(</span><span class="nc">List</span><span class="o">(</span><span class="s">"www"</span><span class="o">,</span><span class="s">"coderblog"</span><span class="o">,</span><span class="s">"cn"</span><span class="o">).</span><span class="n">mkString</span><span class="o">(</span><span class="s">"."</span><span class="o">)</span> <span class="o">==</span> <span class="s">"www.coderblog.cn"</span><span class="o">)</span>
+<span class="n">assert</span><span class="o">(</span><span class="nc">List</span><span class="o">(</span><span class="s">"www"</span><span class="o">,</span><span class="s">"coderblog"</span><span class="o">,</span><span class="s">"cn"</span><span class="o">).</span><span class="n">mkString</span><span class="o">(</span><span class="s">"http://"</span><span class="o">,</span><span class="s">"."</span><span class="o">,</span><span class="s">"/"</span><span class="o">)</span> <span class="o">==</span> <span class="s">"http://www.coderblog.cn/"</span><span class="o">)</span></code></pre></div>
+
+<h2 id="section-1">3. 字符串的格式化输出</h2>
+
+<p>Scala支持四种格式化输出，最常见的是利用占位符来实现。
+使用<code>format</code>函数可以实现对字符串中的占位符替换，如<code>"The ID is %04d".format(1)</code>=<code>"The ID is 0001"</code>
+除了这种方式，从Scala 2.10.0开始提供字符串插值功能，它允许你直接将变量的引用，嵌入到字符串的字面量中，插值方式有以下几种：</p>
+
+<ul>
+  <li>
+    <p>简单插值(The simple string interpolater): 使用前导符<code>s</code>进行标识</p>
+  </li>
+  <li>
+    <p>带格式的插值(The formatted string interpolater):使用前导符<code>f</code>进行标识</p>
+  </li>
+  <li>
+    <p>原始字符串插值(The raw string interpolater):使用前导符<code>raw</code>进行标识,此时不对字符串的的<code>\n</code>,<code>\t</code>等字符进行转义</p>
+  </li>
+</ul>
+
+<div class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="c1">//变量定义
+</span><span class="k">val</span> <span class="n">num</span> <span class="k">=</span> <span class="mi">1</span>
+<span class="k">val</span> <span class="n">nums</span> <span class="k">=</span> <span class="nc">List</span><span class="o">(</span><span class="mi">1</span><span class="o">,</span><span class="mi">2</span><span class="o">,</span><span class="mi">3</span><span class="o">)</span>
+
+<span class="c1">//占位符
+</span><span class="n">assert</span><span class="o">(</span><span class="s">"The num is %04d"</span><span class="o">.</span><span class="n">format</span><span class="o">(</span><span class="n">num</span><span class="o">)</span> <span class="o">==</span> <span class="s">"The num is 0001"</span><span class="o">)</span>
+
+<span class="c1">//简单插值
+</span><span class="n">assert</span><span class="o">(</span><span class="n">s</span><span class="s">"num = $num, nums = $nums, nums.head = ${nums.head}"</span> <span class="o">==</span> <span class="s">"num = 1, nums = List(1, 2, 3), nums.head = 1"</span><span class="o">)</span>
+
+<span class="c1">//带格式的插值
+</span><span class="n">assert</span><span class="o">(</span><span class="n">f</span><span class="s">"num = $num%04d"</span> <span class="o">==</span> <span class="s">"num = 0001"</span><span class="o">)</span>
+
+<span class="c1">//原始插值
+</span><span class="n">assert</span><span class="o">(</span><span class="n">raw</span><span class="s">"a\nb"</span> <span class="o">==</span> <span class="s">"a\\nb"</span><span class="o">)</span></code></pre></div>
+
+<h2 id="section-2">4. 字符串的自定义扩展</h2>
+<p>Scala的字符串插值是由<code>StringContext</code>类来实现的，如<code>s"a = $a, b = $b"</code>会被重写成<code>StringContext("a = ",", b = ","").s(a,b)</code>，并由StringContext中的s函数来完成字符串的拼接工作，拼接函数如下：</p>
+
+<div class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">def</span> <span class="n">standardInterpolator</span><span class="o">(</span><span class="n">process</span><span class="k">:</span> <span class="kt">String</span> <span class="o">=&gt;</span> <span class="nc">String</span><span class="o">,</span> <span class="n">args</span><span class="k">:</span> <span class="kt">Seq</span><span class="o">[</span><span class="kt">Any</span><span class="o">])</span><span class="k">:</span> <span class="kt">String</span> <span class="o">=</span> <span class="o">{</span>
+    <span class="n">checkLengths</span><span class="o">(</span><span class="n">args</span><span class="o">)</span>
+    <span class="k">val</span> <span class="n">pi</span> <span class="k">=</span> <span class="n">parts</span><span class="o">.</span><span class="n">iterator</span>
+    <span class="k">val</span> <span class="n">ai</span> <span class="k">=</span> <span class="n">args</span><span class="o">.</span><span class="n">iterator</span>
+    <span class="k">val</span> <span class="n">bldr</span> <span class="k">=</span> <span class="k">new</span> <span class="n">java</span><span class="o">.</span><span class="n">lang</span><span class="o">.</span><span class="nc">StringBuilder</span><span class="o">(</span><span class="n">process</span><span class="o">(</span><span class="n">pi</span><span class="o">.</span><span class="n">next</span><span class="o">()))</span>
+    <span class="k">while</span> <span class="o">(</span><span class="n">ai</span><span class="o">.</span><span class="n">hasNext</span><span class="o">)</span> <span class="o">{</span>
+      <span class="n">bldr</span> <span class="n">append</span> <span class="n">ai</span><span class="o">.</span><span class="n">next</span>
+      <span class="n">bldr</span> <span class="n">append</span> <span class="n">process</span><span class="o">(</span><span class="n">pi</span><span class="o">.</span><span class="n">next</span><span class="o">())</span>
+    <span class="o">}</span>
+    <span class="n">bldr</span><span class="o">.</span><span class="n">toString</span>
+  <span class="o">}</span></code></pre></div>
+
+<p>因此，我们可以扩展StringContext的功能（通过隐式转换功能），来自定义字符串插值函数，下面定义一个插值函数，实现将变量的值用”[]”包围起来的功能。</p>
+
+<div class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">implicit</span> <span class="k">class</span> <span class="nc">WrapVarHelper</span><span class="o">(</span><span class="k">val</span> <span class="n">sc</span><span class="k">:</span> <span class="kt">StringContext</span><span class="o">)</span> <span class="k">extends</span> <span class="nc">AnyVal</span> <span class="o">{</span>
+    <span class="k">def</span> <span class="n">wrap</span><span class="o">(</span><span class="n">args</span><span class="k">:</span> <span class="kt">Any*</span><span class="o">)</span><span class="k">:</span> <span class="kt">String</span> <span class="o">=</span> <span class="o">{</span>
+      <span class="k">val</span> <span class="n">strings</span> <span class="k">=</span> <span class="n">sc</span><span class="o">.</span><span class="n">parts</span><span class="o">.</span><span class="n">iterator</span>
+      <span class="k">val</span> <span class="n">expressions</span> <span class="k">=</span> <span class="n">args</span><span class="o">.</span><span class="n">iterator</span>
+      <span class="k">val</span> <span class="n">buf</span> <span class="k">=</span> <span class="k">new</span> <span class="nc">StringBuilder</span><span class="o">(</span><span class="n">strings</span><span class="o">.</span><span class="n">next</span><span class="o">)</span>
+      <span class="k">while</span><span class="o">(</span><span class="n">strings</span><span class="o">.</span><span class="n">hasNext</span><span class="o">)</span> <span class="o">{</span>
+        <span class="n">buf</span> <span class="n">append</span> <span class="s">"["</span>
+        <span class="n">buf</span> <span class="n">append</span> <span class="n">expressions</span><span class="o">.</span><span class="n">next</span>
+        <span class="n">buf</span> <span class="n">append</span> <span class="s">"]"</span>
+        <span class="n">buf</span> <span class="n">append</span> <span class="n">strings</span><span class="o">.</span><span class="n">next</span>
+      <span class="o">}</span>
+      <span class="n">buf</span><span class="o">.</span><span class="n">toString</span>
+    <span class="o">}</span>
+  <span class="o">}</span></code></pre></div>
+
+<p>此时, <code>wrap"num = $num"</code>=<code>num = [1]</code>，实现过程是<code>new WrapVarHelper(new StringContext("num = ","")).wrap(num)</code>}</p>
+
+<p>另外，也可以定义一个String类型的隐式转换，扩展字符串的操作函数。</p>
+
+<div class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">implicit</span> <span class="k">class</span> <span class="nc">CustomStringOps</span><span class="o">(</span><span class="k">val</span> <span class="n">repr</span><span class="k">:</span> <span class="kt">String</span><span class="o">)</span> <span class="k">extends</span> <span class="nc">AnyVal</span> <span class="o">{</span>
+  <span class="k">def</span> <span class="n">toBase64</span><span class="k">:</span> <span class="kt">String</span> <span class="o">=</span> <span class="k">new</span> <span class="n">sun</span><span class="o">.</span><span class="n">misc</span><span class="o">.</span><span class="nc">BASE64Encoder</span><span class="o">().</span><span class="n">encode</span><span class="o">(</span><span class="n">repr</span><span class="o">.</span><span class="n">getBytes</span><span class="o">)</span>
+<span class="o">}</span>
+
+<span class="n">assert</span><span class="o">(</span><span class="s">"homeway88"</span><span class="o">.</span><span class="n">toBase64</span> <span class="o">==</span> <span class="s">"aG9tZXdheTg4"</span><span class="o">)</span></code></pre></div>
+
+<h2 id="section-3">5.总结</h2>
+<p>Scala中的String类型引用自Java的原生类型<code>java.lang.String</code>,并通过隐式转换扩展了字符串的操作函数，同时保留了和Java字符串的兼容性，而且可以非常容易地实现自定义操作函数，Scala语言的强大性可见一斑。</p>
+
+<h2 id="section-4">参考资料</h2>
+<p><a href="http://docs.scala-lang.org/overviews/core/string-interpolation.html">http://docs.scala-lang.org/overviews/core/string-interpolation.html</a></p>
+
+      <footer class="entry-meta">
+        <span class="entry-tags"><a href="http://www.coderblog.cn/tags#Scala" title="Pages tagged Scala" class="tag"><span class="term">Scala</span></a><a href="http://www.coderblog.cn/tags#字符串" title="Pages tagged 字符串" class="tag"><span class="term">字符串</span></a></span>
+        
+        <span class="author vcard"><span class="fn">homeway88</span></span>
+        <div class="social-share">
+  <ul class="socialcount socialcount-small inline-list">
+    <li class="facebook"><a href="https://www.facebook.com/sharer/sharer.php?u=http://www.coderblog.cn/scala/string-manipulation-and-interpolation-in-scala/" title="Share on Facebook"><span class="count"><i class="fa fa-facebook-square"></i> Like</span></a></li>
+    <li class="twitter"><a href="https://twitter.com/intent/tweet?text=http://www.coderblog.cn/scala/string-manipulation-and-interpolation-in-scala/" title="Share on Twitter"><span class="count"><i class="fa fa-twitter-square"></i> Tweet</span></a></li>
+    <li class="googleplus"><a href="https://plus.google.com/share?url=http://www.coderblog.cn/scala/string-manipulation-and-interpolation-in-scala/" title="Share on Google Plus"><span class="count"><i class="fa fa-google-plus-square"></i> +1</span></a></li>
+  </ul>
+</div><!-- /.social-share -->
+
+      </footer>
+    </div><!-- /.entry-content -->
+    <div class="read-more">
+  <div class="read-more-header">
+    <a href="http://www.coderblog.cn" class="read-more-btn">About the Author</a>
+  </div><!-- /.read-more-header -->
+  <div class="read-more-content author-info">
+    <h3>homeway88</h3>
+    <div class="author-container">
+      <img class="author-img" src="http://www.coderblog.cn/images/avatar.jpg" alt="homeway88" />
+      <div class="author-bio">生命不息，编程不止</div>
+    </div>
+    <div class="author-share">
+      <ul class="list-inline social-buttons">
+        
+          <li><a href="https://github.com/homeway88" target="_blank"><i class="fa fa-github fa-fw"></i></a></li>
+        
+          <li><a href="https://br.linkedin.com/in/aronbordin" target="_blank"><i class="fa fa-linkedin fa-fw"></i></a></li>
+        
+      </ul>
+      
+        <a aria-label="Follow @homeway88 on GitHub" data-style="mega" href="https://github.com/homeway88" class="github-button">Follow @homeway88</a>
+      
+      <br>
+      
+        <a href="https://twitter.com/homeway88" class="twitter-follow-button" data-show-count="false" data-size="large">Follow @homeway88</a>
+      
+    </div>
+  </div>
+</div>
+
+    
+    
+  </article>
+</div><!-- /#main -->
+
+<script type="text/javascript" src="//cdn.bootcss.com/jquery/1.11.3/jquery.min.js"></script>
+<script type="text/javascript">window.jQuery || document.write('<script type="text/javascript" src="http://www.coderblog.cn/assets/js/vendor/jquery-1.9.1.min.js"><\/script>')</script>
+<script type="text/javascript" src="http://www.coderblog.cn/assets/js/scripts.min.js"></script>
+<script type="text/javascript" async defer id="github-bjs" src="https://buttons.github.io/buttons.js"></script>
+<script type="text/javascript">!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');</script>
+
+
+
+
+<script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "//hm.baidu.com/hm.js?bd13f227a0a1ccb2ff4b9f9ca805b95b";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+
+
+
+
+
+
+
+
+<div class="footer-wrapper">
+  <footer role="contentinfo">
+    <span>&copy; 2016 homeway88. Powered by <a href="http://jekyllrb.com" rel="nofollow">Jekyll</a> using the <a href="http://github.com/aron-bordin/neo-hpstr-jekyll-theme" rel="nofollow">Neo-HPSTR Theme</a>.</span>
+
+  </footer>
+</div><!-- /.footer-wrapper -->
+
+</body>
+</html>
