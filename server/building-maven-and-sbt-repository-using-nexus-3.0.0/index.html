@@ -1,0 +1,599 @@
+<!doctype html>
+<!--[if lt IE 7]><html class="no-js lt-ie9 lt-ie8 lt-ie7" lang="en"> <![endif]-->
+<!--[if (IE 7)&!(IEMobile)]><html class="no-js lt-ie9 lt-ie8" lang="en"><![endif]-->
+<!--[if (IE 8)&!(IEMobile)]><html class="no-js lt-ie9" lang="en"><![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en"><!--<![endif]-->
+<head>
+<meta charset="utf-8">
+<title>利用Nexus 3.0.0搭建Maven与SBT私服仓库 &#8211; Homeway's Blog</title>
+<meta name="description" content="Homeway's Blog">
+<meta name="keywords" content="Server, Maven, SBT, Nexus, Scala">
+
+<!-- Twitter Cards -->
+<meta name="twitter:card" content="summary">
+<meta name="twitter:site" content="@homeway88">
+<meta name="twitter:creator" content="@homeway88">
+
+<!-- Open Graph -->
+<meta property="og:locale" content="zh_CN">
+<meta property="og:type" content="article">
+<meta property="og:title" content="利用Nexus 3.0.0搭建Maven与SBT私服仓库">
+<meta property="og:description" content="Homeway's Blog">
+<meta property="og:url" content="http://www.coderblog.cn/server/building-maven-and-sbt-repository-using-nexus-3.0.0/">
+<meta property="og:site_name" content="Homeway's Blog">
+<meta property="og:image" content="http://www.coderblog.cn/images/">
+
+
+
+
+
+<link rel="canonical" href="http://www.coderblog.cn/server/building-maven-and-sbt-repository-using-nexus-3.0.0/">
+<link href="http://www.coderblog.cn/feed.xml" type="application/atom+xml" rel="alternate" title="Homeway's Blog Feed">
+
+<!-- http://t.co/dKP3o1e -->
+<meta name="HandheldFriendly" content="True">
+<meta name="MobileOptimized" content="320">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0, user-scalable=no"/>
+
+<!-- For all browsers -->
+<link rel="stylesheet" href="http://www.coderblog.cn/assets/css/main.css">
+<link rel="stylesheet" href="http://www.coderblog.cn/assets/css/jquery.mmenu.all.css">
+<link rel="stylesheet" href="http://www.coderblog.cn/assets/css/jquery.floating-social-share.min.css">
+<!-- Webfonts -->
+<link href="http://www.coderblog.cn/assets/css/lato.css" rel="stylesheet" type="text/css">
+
+<meta http-equiv="cleartype" content="on">
+
+<!-- Load Modernizr -->
+<script type="text/javascript" src="http://www.coderblog.cn/assets/js/vendor/modernizr-2.6.2.custom.min.js"></script>
+
+<!-- Icons -->
+<!-- 16x16 -->
+<link rel="shortcut icon" href="http://www.coderblog.cn/favicon.ico">
+<!-- 32x32 -->
+<link rel="shortcut icon" href="http://www.coderblog.cn/favicon.png">
+<!-- 57x57 (precomposed) for iPhone 3GS, pre-2011 iPod Touch and older Android devices -->
+<link rel="apple-touch-icon-precomposed" href="http://www.coderblog.cn/images/apple-touch-icon-precomposed.png">
+<!-- 72x72 (precomposed) for 1st generation iPad, iPad 2 and iPad mini -->
+<link rel="apple-touch-icon-precomposed" sizes="72x72" href="http://www.coderblog.cn/images/apple-touch-icon-72x72-precomposed.png">
+<!-- 114x114 (precomposed) for iPhone 4, 4S, 5 and post-2011 iPod Touch -->
+<link rel="apple-touch-icon-precomposed" sizes="114x114" href="http://www.coderblog.cn/images/apple-touch-icon-114x114-precomposed.png">
+<!-- 144x144 (precomposed) for iPad 3rd and 4th generation -->
+<link rel="apple-touch-icon-precomposed" sizes="144x144" href="http://www.coderblog.cn/images/apple-touch-icon-144x144-precomposed.png">
+
+
+
+
+</head>
+
+<body id="post" >
+
+<!--[if lt IE 9]><div class="upgrade"><strong><a href="http://whatbrowser.org/">Your browser is quite old!</strong> Why not upgrade to a different browser to better enjoy this site?</a></div><![endif]-->
+
+
+
+<div class="header-menu header-menu-top">
+    <ul class="header-item-container">
+      <li class="header-item-title header-toggle "><a href="#menu"><h2><i class="fa fa-bars"></i></h2></a></li>
+      <li class="header-item-title">
+        <a href="http://www.coderblog.cn/">
+          
+          <a href="http://www.coderblog.cn/" class="title"> Homeway's Blog</a>
+        </a>
+      </li>
+      
+        
+        
+
+        
+            
+                <li class="header-item "><a href="http://www.coderblog.cn/about"><h3>关于我</h3></a></li>
+            
+        
+      
+        
+        
+
+        
+          <li class="header-item "><a href="http://www.coderblog.cn/categories"><h3>分类</h3></a>
+            <ul class="header-submenu">
+              
+                
+                  <li class="sub-item"><a href="/categories/#scala">scala</a></li>
+              
+                
+                  <li class="sub-item"><a href="/categories/#server">server</a></li>
+              
+            </ul>
+          </li>
+        
+      
+        
+        
+
+        
+            
+                <li class="header-item "><a href="http://www.coderblog.cn/tags"><h3>标签</h3></a></li>
+            
+        
+      
+        
+        
+
+        
+            
+                <li class="header-item "><a href="http://www.coderblog.cn/"><h3>主页</h3></a></li>
+            
+        
+      
+      
+    </ul>
+  </div>
+<div class="entry-header">
+  <div class="header-title">
+    <div class="header-title-wrap">
+      <h1>利用Nexus 3.0.0搭建Maven与SBT私服仓库</h1>
+      
+        <h2><span class="entry-date date published updated"><time datetime="2016-05-11T00:00:00+08:00">May 11, 2016</time></span></h2>
+      
+
+      
+        <p class="entry-reading-time">
+          <i class="fa fa-clock-o"></i>
+          
+          Reading time ~2 minutes
+        </p><!-- /.entry-reading-time -->
+      
+    </div><!-- /.header-title-wrap -->
+  </div><!-- /.header-title -->
+</div><!-- /.entry-header -->
+
+
+<nav id="menu" style="display: none">
+  <ul>
+    
+      
+        <li><a href="http://www.coderblog.cn/"><h3>主页</h3></a></li>
+      
+    
+      
+        <li><a href="http://www.coderblog.cn/tags"><h3>标签</h3></a></li>
+      
+    
+      
+        <li><a href="http://www.coderblog.cn/categories"><h3>分类</h3></a>
+          <ul>
+            
+              
+                <li><a href="http://www.coderblog.cn/categories/#scala">scala</a></li>
+            
+              
+                <li><a href="http://www.coderblog.cn/categories/#server">server</a></li>
+            
+          </ul>
+        </li>
+      
+    
+      
+        <li><a href="http://www.coderblog.cn/about"><h3>关于我</h3></a></li>
+      
+    
+  </ul>
+</nav>
+
+
+  <a href="https://twitter.com/homeway88" class="btn btn-info button-twitter" data-show-count="false" data-size="large"><i class="fa fa-twitter"></i> <span> | Follow @homeway88</span></a>
+
+
+
+<div id="main" role="main">
+  <article class="hentry">
+    <div class="entry-content">
+        
+      <h1 class="post-title entry-title">利用Nexus 3.0.0搭建Maven与SBT私服仓库</h1>
+      <p>Maven与SBT都是非常流行的Java、Scala工程的构建工具，构建工程时需要从中央仓库中下载相应的依赖包，此时下载速度往往决定了首次构建该工程的速度，由于我所在的公司对网络进行了限制，平均下载速度仅100kB/s不到，有时候构建大型工程时（如Play Framework工程），仅下载依赖就要耗费几个小时的时间，因此，我决定自行搭建私服仓库，优点如下：</p>
+
+<ul>
+  <li>避免重复下载，加快构建速度：对于同一个依赖包，首次引用时从中央仓库下载一次，并缓存在私服仓库中，其他人再次引用该依赖包时，只需要从私服仓库下载即可，内网速度非常快。</li>
+  <li>部分服务器没有外网访问权限：对于一些内网中的生产服务器，由于安全考虑没有外网访问权限，但又需要进行工程构建时，可以配置其从内网中的私服仓库中下载。</li>
+  <li>发布公司的内部模块：公司开发的内部模块，称为二方库，可以直接发布在私服仓库上，供公司内部共享使用，避免重复造轮子。
+<img src="http://www.coderblog.cn/images/posts/proxy-cloud-setup.png" alt="私服仓库架构" /></li>
+</ul>
+
+<!-- more -->
+
+<h2 id="nexus-300">1. Nexus 3.0.0下载与安装</h2>
+<p>构建私服仓库有几种解决方案：<a href="http://archiva.apache.org/index.cgi">Archiva</a> 、<a href="http://www.jfrog.com/home/v_artifactory_opensource_overview">Artifactory</a> 与 <a href="http://www.sonatype.org/nexus/">Nexus</a>。由于Nexus功能强大，配置简单，并且有简单易用的UI界面，而且有免费的开源版本，因此这里选用Nexus作为私服仓库。</p>
+
+<h3 id="nexus-300-1">1.1 Nexus 3.0.0下载</h3>
+
+<ul>
+  <li>官网地址：<a href="http://www.sonatype.org/nexus/">http://www.sonatype.org/nexus/</a>,</li>
+  <li>下载地址：<a href="http://www.sonatype.com/download-oss-sonatype">http://www.sonatype.com/download-oss-sonatype</a></li>
+  <li>下载 Nexus Repository Manager OSS 3.xx，按照服务器的平台选择对应的版本，这里是部署在Linux平台下，因此选择nexus-3.0.0-03-unix.tar.gz，OSS即Open Source Software，可以免费使用，注意3.xx版本需要JDK1.8版本以上才能运行</li>
+  <li>将下载好的文件解压后，执行<code>bin/nexus start</code>即可，注意不要使用root帐户启动，成功启动后便可通过<a href="http://localhost:8081/">http://localhost:8081/</a>或者<code>http://服务器IP:8081/</code>进行访问，界面如下：</li>
+</ul>
+
+<div class="highlight"><pre><code class="language-bash" data-lang="bash">tar -xf nexus-3.0.0-03-unix.tar.gz
+<span class="nb">cd </span>nexus-3.0.0-03
+./bin/nexus start</code></pre></div>
+
+<p><img src="http://www.coderblog.cn/images/posts/nexus-web-ui.png" alt="Nexus界面" /></p>
+
+<h3 id="nexus">1.2 Nexus仓库配置</h3>
+<p>Nexus仓库有以下几种类型：</p>
+
+<ul>
+  <li><code>hosted</code>，本地仓库，通常我们会部署自己的构件到这一类型的仓库,比如公司的第二方库。</li>
+  <li><code>proxy</code>，代理仓库，它们被用来代理远程的公共仓库，如maven中央仓库。</li>
+  <li><code>group</code>，仓库组，用来合并多个hosted/proxy仓库，当你的项目希望在多个repository使用资源时就不需要多次引用了，只需要引用一个group即可。</li>
+</ul>
+
+<p>点击Nexus界面右上角的<code>Sign in</code>按钮，默认用户名和密码为：<code>admin</code>/<code>admin123</code>。登录后可以对Nexus进行配置，登录后点击配置按钮，并进入到<code>repositories</code>的管理界面，界面如下：</p>
+
+<p><img src="http://www.coderblog.cn/images/posts/nexus-repository-setup.png" alt="Nexus仓库管理界面" /></p>
+
+<p>默认已经添加了Maven的中央仓库，仓库地址为http://服务器IP:8081/repository/maven-public/ ，因此，我们只需要为SBT添加相应的仓库即可,点击<code>Create repository</code>按钮,选择仓库类型为<code>maven2/proxy</code>，然后填入仓库名称和URL，主要有以下两个仓库：</p>
+
+<ul>
+  <li>type-safe: <a href="http://repo.typesafe.com/typesafe/ivy-releases/">http://repo.typesafe.com/typesafe/ivy-releases/</a></li>
+  <li>sbt-plugin: <a href="http://dl.bintray.com/sbt/sbt-plugin-releases/">http://dl.bintray.com/sbt/sbt-plugin-releases/</a></li>
+</ul>
+
+<p>创建该仓库后，可以将以上的两个仓库归入同一个组中，方法是点击<code>Create repository</code>按钮，选择仓库类型为<code>maven2/group</code>,命令该仓库为<code>ivy-releases</code>并将以上两个仓库移入该分组中。</p>
+
+<p><img src="http://www.coderblog.cn/images/posts/nexus-ivy-releases-group.png" alt="Ivy-releases分组" /></p>
+
+<h2 id="mavensbt">2. Maven与SBT配置</h2>
+
+<p>由于我的服务器域名为<code>nas.com</code>，因此以下所有配置的服务器名均为<code>http://nas.com:8081/</code>,实际使用的时候自行替换成服务器IP即可。</p>
+
+<h3 id="maven">2.1 Maven配置</h3>
+<p>找到maven的配置文件，一般路径为：<code>~/.m2/settings.xml</code>，如果没有，则新建该文件，设置文件内容如下：</p>
+
+<div class="highlight"><pre><code class="language-xml" data-lang="xml"><span class="nt">&lt;settings</span> <span class="na">xmlns=</span><span class="s">"http://maven.apache.org/SETTINGS/1.0.0"</span>
+         <span class="na">xmlns:xsi=</span><span class="s">"http://www.w3.org/2001/XMLSchema-instance"</span>
+         <span class="na">xsi:schemaLocation=</span><span class="s">"http://maven.apache.org/SETTINGS/1.0.0</span>
+            <span class="err">http://maven.apache.org/xsd/settings-1.0.0.xsd"</span><span class="nt">&gt;</span>
+    <span class="nt">&lt;mirrors&gt;</span>
+	    <span class="nt">&lt;mirror&gt;</span>
+			<span class="nt">&lt;id&gt;</span>nexus<span class="nt">&lt;/id&gt;</span>
+			<span class="nt">&lt;mirrorOf&gt;</span>*<span class="nt">&lt;/mirrorOf&gt;</span>
+			<span class="nt">&lt;name&gt;</span>Nexus<span class="nt">&lt;/name&gt;</span>
+			<span class="nt">&lt;url&gt;</span>http://nas.com:8081/repository/maven-public/<span class="nt">&lt;/url&gt;</span>
+		<span class="nt">&lt;/mirror&gt;</span>
+	<span class="nt">&lt;/mirrors&gt;</span>
+<span class="nt">&lt;/settings&gt;</span></code></pre></div>
+
+<p>此时，可以通过建立Maven工程，并执行打包命令，看看所需依赖是否能从私服仓库正确下载。
+新建<code>pom.xml</code>文件，内容如下：</p>
+
+<div class="highlight"><pre><code class="language-xml" data-lang="xml"><span class="cp">&lt;?xml version="1.0" encoding="UTF-8"?&gt;</span>
+<span class="nt">&lt;project</span> <span class="na">xmlns=</span><span class="s">"http://maven.apache.org/POM/4.0.0"</span>
+         <span class="na">xmlns:xsi=</span><span class="s">"http://www.w3.org/2001/XMLSchema-instance"</span>
+         <span class="na">xsi:schemaLocation=</span><span class="s">"http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"</span><span class="nt">&gt;</span>
+    <span class="nt">&lt;modelVersion&gt;</span>4.0.0<span class="nt">&lt;/modelVersion&gt;</span>
+
+    <span class="nt">&lt;groupId&gt;</span>com.homeway<span class="nt">&lt;/groupId&gt;</span>
+    <span class="nt">&lt;artifactId&gt;</span>mvntest2<span class="nt">&lt;/artifactId&gt;</span>
+    <span class="nt">&lt;version&gt;</span>1.0-SNAPSHOT<span class="nt">&lt;/version&gt;</span>
+
+    <span class="nt">&lt;dependencies&gt;</span>
+        <span class="nt">&lt;dependency&gt;</span>
+            <span class="nt">&lt;groupId&gt;</span>junit<span class="nt">&lt;/groupId&gt;</span>
+            <span class="nt">&lt;artifactId&gt;</span>junit<span class="nt">&lt;/artifactId&gt;</span>
+            <span class="nt">&lt;version&gt;</span>4.11<span class="nt">&lt;/version&gt;</span>
+        <span class="nt">&lt;/dependency&gt;</span>
+    <span class="nt">&lt;/dependencies&gt;</span>
+
+<span class="nt">&lt;/project&gt;</span></code></pre></div>
+
+<p>并执行<code>mvn package</code>命令，如果可以看到以下输出，则证明此私服仓库已经正常工作。</p>
+
+<div class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="o">[</span>INFO] Scanning <span class="k">for </span>projects...
+<span class="o">[</span>INFO]
+<span class="o">[</span>INFO] ------------------------------------------------------------------------
+<span class="o">[</span>INFO] Building mvntest2 1.0-SNAPSHOT
+<span class="o">[</span>INFO] ------------------------------------------------------------------------
+Downloading: http://nas.com:8081/repository/maven-public/org/apache/maven/plugins/maven-resources-plugin/2.3/maven-resources-plugin-2.3.pom
+Downloaded: http://nas.com:8081/repository/maven-public/org/apache/maven/plugins/maven-resources-plugin/2.3/maven-resources-plugin-2.3.pom <span class="o">(</span>5 KB at 0.9 KB/sec<span class="o">)</span>
+Downloading: http://nas.com:8081/repository/maven-public/org/apache/maven/plugins/maven-plugins/12/maven-plugins-12.pom
+Downloaded: http://nas.com:8081/repository/maven-public/org/apache/maven/plugins/maven-plugins/12/maven-plugins-12.pom <span class="o">(</span>0 B at 0.0 KB/sec<span class="o">)</span>
+Downloading: http://nas.com:8081/repository/maven-public/com/google/google/1/google-1.pom
+Downloaded: http://nas.com:8081/repository/maven-public/com/google/google/1/google-1.pom <span class="o">(</span>0 B at 0.0 KB/sec<span class="o">)</span>
+Downloading: http://nas.com:8081/repository/maven-public/junit/junit/3.8.2/junit-3.8.2.pom
+Downloaded: http://nas.com:8081/repository/maven-public/junit/junit/3.8.2/junit-3.8.2.pom <span class="o">(</span>0 B at 0.0 KB/sec<span class="o">)</span>
+.
+.
+.
+<span class="o">[</span>WARNING] JAR will be empty - no content was marked <span class="k">for </span>inclusion!
+<span class="o">[</span>INFO] Building jar: /home/homeway/MvnTest/target/mvntest2-1.0-SNAPSHOT.jar
+<span class="o">[</span>INFO] ------------------------------------------------------------------------
+<span class="o">[</span>INFO] BUILD SUCCESS
+<span class="o">[</span>INFO] ------------------------------------------------------------------------
+<span class="o">[</span>INFO] Total <span class="nb">time</span>: 03:30 min
+<span class="o">[</span>INFO] Finished at: 2016-04-30T07:35:45+08:00
+<span class="o">[</span>INFO] Final Memory: 10M/26M
+<span class="o">[</span>INFO] ------------------------------------------------------------------------</code></pre></div>
+
+<h3 id="sbt">2.2 SBT配置</h3>
+<p>SBT的依赖管理是基于Ivy，但是也可以使用Maven进行包依赖管理，因此需要分别配置;
+找到SBT的仓库配置文件，一般路径如为：<code>~/.sbt/repositories</code>，如果没有，则新建一个，并设置内容如下：</p>
+
+<div class="highlight"><pre><code class="language-yaml" data-lang="yaml"><span class="pi">[</span><span class="nv">repositories</span><span class="pi">]</span><span class="err">
+</span>
+  <span class="s">local</span><span class="err">
+</span>
+  <span class="s">my-ivy-proxy-releases</span><span class="pi">:</span> <span class="s">http://nas.com:8081/repository/ivy-releases/, [organization]/[module]/(scala_[scalaVersion]/)(sbt_[sbtVersion]/)[revision]/[type]s/[artifact](-[classifier]).[ext]</span><span class="err">
+</span>
+  <span class="s">my-maven-proxy-releases</span><span class="pi">:</span> <span class="s">http://nas.com:8081/repository/maven-public/</span></code></pre></div>
+
+<p>此时，新建SBT工程进行测试，新建<code>build.sbt</code>文件，内容如下：</p>
+
+<div class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="n">name</span> <span class="o">:=</span> <span class="s">"SbtTest2"</span>
+
+<span class="n">version</span> <span class="o">:=</span> <span class="s">"1.0"</span>
+
+<span class="n">scalaVersion</span> <span class="o">:=</span> <span class="s">"2.11.8"</span>
+
+<span class="n">libraryDependencies</span> <span class="o">+=</span> <span class="s">"org.apache.kafka"</span> <span class="o">%%</span> <span class="s">"kafka"</span> <span class="o">%</span> <span class="s">"0.9.0.0"</span></code></pre></div>
+
+<p>并执行<code>sbt package</code>命令(有时需要增加<code>-Dsbt.override.build.repos=true</code>参数)，如果可以看到以下输出，则证明此私服仓库已经正常工作。</p>
+
+<div class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="o">[</span>info] Set current project to SbtTest2 <span class="o">(</span><span class="k">in </span>build file:/home/homeway/SbtTest/<span class="o">)</span>
+<span class="o">[</span>info] Updating <span class="o">{</span>file:/home/homeway/SbtTest/<span class="o">}</span>sbttest...
+<span class="o">[</span>info] Resolving jline#jline;2.12.1 ...
+<span class="o">[</span>info] downloading http://nas.com:8081/repository/maven-public/org/scala-lang/scala-library/2.11.8/scala-library-2.11.8.jar ...
+<span class="o">[</span>info]  <span class="o">[</span>SUCCESSFUL <span class="o">]</span> org.scala-lang#scala-library;2.11.8!scala-library.jar <span class="o">(</span>2908ms<span class="o">)</span>
+<span class="o">[</span>info] downloading http://nas.com:8081/repository/maven-public/org/apache/kafka/kafka_2.11/0.9.0.0/kafka_2.11-0.9.0.0.jar ...
+<span class="o">[</span>info]  <span class="o">[</span>SUCCESSFUL <span class="o">]</span> org.apache.kafka#kafka_2.11;0.9.0.0!kafka_2.11.jar <span class="o">(</span>276ms<span class="o">)</span>
+<span class="o">[</span>info] downloading http://nas.com:8081/repository/maven-public/com/101tec/zkclient/0.7/zkclient-0.7.jar ...
+<span class="o">[</span>info]  <span class="o">[</span>SUCCESSFUL <span class="o">]</span> com.101tec#zkclient;0.7!zkclient.jar <span class="o">(</span>4922ms<span class="o">)</span>
+<span class="o">[</span>info] downloading http://nas.com:8081/repository/maven-public/com/yammer/metrics/metrics-core/2.2.0/metrics-core-2.2.0.jar ...
+.
+.
+.
+<span class="o">[</span>success] Total <span class="nb">time</span>: 1 s, completed 2016-5-12 15:17:12</code></pre></div>
+
+<h2 id="section">3. 二方库发布</h2>
+<p>为了在公司内部共享一些功能模块，我们需要将工程打包后发布到私服仓库中，以便其他团队的人员进行使用。利用<code>mvn deploy</code>与<code>sbt publish</code>命令，可以帮助我们将完成工程构建与发布的功能，只需要添加相关的仓库设置即可。</p>
+
+<h3 id="maven-1">3.1 Maven发布</h3>
+<p>首先，需要在<code>~/.m2/settings.xml</code>中增加发布时的用户认证参数，修改该文件后内容如下：</p>
+
+<div class="highlight"><pre><code class="language-xml" data-lang="xml"><span class="nt">&lt;settings</span> <span class="na">xmlns=</span><span class="s">"http://maven.apache.org/SETTINGS/1.0.0"</span>
+         <span class="na">xmlns:xsi=</span><span class="s">"http://www.w3.org/2001/XMLSchema-instance"</span>
+         <span class="na">xsi:schemaLocation=</span><span class="s">"http://maven.apache.org/SETTINGS/1.0.0</span>
+            <span class="err">http://maven.apache.org/xsd/settings-1.0.0.xsd"</span><span class="nt">&gt;</span>
+    <span class="nt">&lt;mirrors&gt;</span>
+      <span class="nt">&lt;mirror&gt;</span>
+      <span class="nt">&lt;id&gt;</span>nexus<span class="nt">&lt;/id&gt;</span>
+      <span class="nt">&lt;mirrorOf&gt;</span>*<span class="nt">&lt;/mirrorOf&gt;</span>
+      <span class="nt">&lt;name&gt;</span>Nexus<span class="nt">&lt;/name&gt;</span>
+      <span class="nt">&lt;url&gt;</span>http://nas.com:8081/repository/maven-public/<span class="nt">&lt;/url&gt;</span>
+    <span class="nt">&lt;/mirror&gt;</span>
+  <span class="nt">&lt;/mirrors&gt;</span>
+  <span class="nt">&lt;servers&gt;</span>
+    <span class="nt">&lt;server&gt;</span>
+      <span class="nt">&lt;id&gt;</span>maven-releases<span class="nt">&lt;/id&gt;</span>
+      <span class="nt">&lt;username&gt;</span>admin<span class="nt">&lt;/username&gt;</span>
+      <span class="nt">&lt;password&gt;</span>admin123<span class="nt">&lt;/password&gt;</span>
+    <span class="nt">&lt;/server&gt;</span>
+    <span class="nt">&lt;server&gt;</span>
+      <span class="nt">&lt;id&gt;</span>maven-snapshots<span class="nt">&lt;/id&gt;</span>
+      <span class="nt">&lt;username&gt;</span>admin<span class="nt">&lt;/username&gt;</span>
+      <span class="nt">&lt;password&gt;</span>admin123<span class="nt">&lt;/password&gt;</span>
+    <span class="nt">&lt;/server&gt;</span>
+  <span class="nt">&lt;/servers&gt;</span>
+<span class="nt">&lt;/settings&gt;</span></code></pre></div>
+
+<p>其次，需要在项目的<code>pom.xml</code>文件中增加发布仓库的位置，修改后的文件内容如下：</p>
+
+<div class="highlight"><pre><code class="language-xml" data-lang="xml"><span class="cp">&lt;?xml version="1.0" encoding="UTF-8"?&gt;</span>
+<span class="nt">&lt;project</span> <span class="na">xmlns=</span><span class="s">"http://maven.apache.org/POM/4.0.0"</span>
+         <span class="na">xmlns:xsi=</span><span class="s">"http://www.w3.org/2001/XMLSchema-instance"</span>
+         <span class="na">xsi:schemaLocation=</span><span class="s">"http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"</span><span class="nt">&gt;</span>
+    <span class="nt">&lt;modelVersion&gt;</span>4.0.0<span class="nt">&lt;/modelVersion&gt;</span>
+
+    <span class="nt">&lt;groupId&gt;</span>com.homeway<span class="nt">&lt;/groupId&gt;</span>
+    <span class="nt">&lt;artifactId&gt;</span>mvntest2<span class="nt">&lt;/artifactId&gt;</span>
+    <span class="nt">&lt;version&gt;</span>1.0-SNAPSHOT<span class="nt">&lt;/version&gt;</span>
+
+    <span class="nt">&lt;dependencies&gt;</span>
+        <span class="nt">&lt;dependency&gt;</span>
+            <span class="nt">&lt;groupId&gt;</span>junit<span class="nt">&lt;/groupId&gt;</span>
+            <span class="nt">&lt;artifactId&gt;</span>junit<span class="nt">&lt;/artifactId&gt;</span>
+            <span class="nt">&lt;version&gt;</span>4.11<span class="nt">&lt;/version&gt;</span>
+        <span class="nt">&lt;/dependency&gt;</span>
+    <span class="nt">&lt;/dependencies&gt;</span>
+    <span class="nt">&lt;distributionManagement&gt;</span>
+        <span class="nt">&lt;repository&gt;</span>
+            <span class="nt">&lt;id&gt;</span>maven-releases<span class="nt">&lt;/id&gt;</span>
+            <span class="nt">&lt;url&gt;</span>http://nas.com:8081/repository/maven-releases/<span class="nt">&lt;/url&gt;</span>
+        <span class="nt">&lt;/repository&gt;</span>
+        <span class="nt">&lt;snapshotRepository&gt;</span>
+            <span class="nt">&lt;id&gt;</span>maven-snapshots<span class="nt">&lt;/id&gt;</span>
+            <span class="nt">&lt;url&gt;</span>http://nas.com:8081/repository/maven-snapshots/<span class="nt">&lt;/url&gt;</span>
+        <span class="nt">&lt;/snapshotRepository&gt;</span>
+    <span class="nt">&lt;/distributionManagement&gt;</span>
+
+<span class="nt">&lt;/project&gt;</span></code></pre></div>
+
+<p>之后，执行<code>mvn deploy</code>命令，即可将工程发布到对应的仓库中。</p>
+
+<h3 id="sbt-1">3.2 SBT发布</h3>
+<p>SBT发布比较麻烦，利用原生的<code>sbt publish</code>命令，无论怎么设置都没法通过用户认证，后面通过搜索，使用<code>aether deploy</code>插件，便可以完成认证过程，方法如下：</p>
+
+<ul>
+  <li>新增用户认证参数文件：`~/.sbt/.credentials”,内容如下</li>
+</ul>
+
+<div class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="nv">realm</span><span class="o">=</span>Some Nexus Repository Manager
+<span class="nv">host</span><span class="o">=</span>nas.com
+<span class="nv">user</span><span class="o">=</span>admin
+<span class="nv">password</span><span class="o">=</span>admin123</code></pre></div>
+
+<ul>
+  <li>在工程设置文件中添加发布仓库设置，修改<code>build.sbt</code>,内容如下：</li>
+</ul>
+
+<div class="highlight"><pre><code class="language-bash" data-lang="bash">name :<span class="o">=</span> <span class="s2">"SbtTest2"</span>
+
+version :<span class="o">=</span> <span class="s2">"1.0-SNAPSHOT"</span>
+
+scalaVersion :<span class="o">=</span> <span class="s2">"2.11.8"</span>
+
+organization :<span class="o">=</span> <span class="s2">"com.homeway"</span>
+
+libraryDependencies +<span class="o">=</span> <span class="s2">"org.apache.kafka"</span> %% <span class="s2">"kafka"</span> % <span class="s2">"0.9.0.0"</span>
+
+credentials +<span class="o">=</span> Credentials<span class="o">(</span>Path.userHome / <span class="s2">".sbt"</span> / <span class="s2">".credentials"</span><span class="o">)</span>
+
+publishTo &lt;&lt;<span class="o">=</span> <span class="o">(</span>version<span class="o">)</span> apply <span class="o">{(</span>v: String<span class="o">)</span> <span class="o">=</span>&gt;
+  <span class="k">if</span> <span class="o">(</span>v.endsWith<span class="o">(</span><span class="s2">"SNAPSHOT"</span><span class="o">))</span> <span class="o">{</span>
+    Some<span class="o">(</span><span class="s2">"maven-snapshots"</span> at <span class="s2">"http://nas.com:8081/repository/maven-snapshots/"</span><span class="o">)</span>
+  <span class="o">}</span> <span class="k">else</span> <span class="o">{</span>
+    Some<span class="o">(</span><span class="s2">"maven-releases"</span> at <span class="s2">"http://nas.com:8081/repository/maven-releases/"</span><span class="o">)</span>
+  <span class="o">}</span>
+<span class="o">}</span></code></pre></div>
+
+<ul>
+  <li>添加<code>aether deploy</code>插件，即修改<code>project/plugins.sbt</code>，内容如下：</li>
+</ul>
+
+<div class="highlight"><pre><code class="language-bash" data-lang="bash">addSbtPlugin<span class="o">(</span><span class="s2">"no.arktekk.sbt"</span> % <span class="s2">"aether-deploy"</span> % <span class="s2">"0.17"</span><span class="o">)</span></code></pre></div>
+
+<ul>
+  <li>执行<code>sbt aether-deploy</code>命令，即可将工程发布到对应的仓库中。</li>
+</ul>
+
+<p>发布后便可以在Nexus中查询到对应的模块，并且可以在其他工程中进行引用。</p>
+
+<p><img src="http://www.coderblog.cn/images/posts/maven-sbt-publish-to-nexus.png" alt="发布结果" /></p>
+
+<h2 id="section-1">4. 总结</h2>
+<p>利用Nexus搭建Maven与SBT私服仓库，不仅可以实现工程的快速构建和公司内部的二方库共享，利用相关的插件，还能够实现版本控制、自动化打包、自动化部署等功能，是构建智能化的开发环境的必备选择。</p>
+
+<h2 id="section-2">参考资料</h2>
+
+<ul>
+  <li><a href="https://books.sonatype.com/nexus-book/3.0/reference/admin.html#_repository_management_example">Nexus Repository Manager 3.0</a></li>
+  <li><a href="http://www.scala-sbt.org/release/docs/Proxy-Repositories.html">SBT Proxy Repository</a></li>
+  <li><a href="http://www.scala-sbt.org/0.13/docs/Publishing.html">SBT Publishing</a></li>
+</ul>
+
+      <footer class="entry-meta">
+        <span class="entry-tags"><a href="http://www.coderblog.cn/tags#Server" title="Pages tagged Server" class="tag"><span class="term">Server</span></a><a href="http://www.coderblog.cn/tags#Maven" title="Pages tagged Maven" class="tag"><span class="term">Maven</span></a><a href="http://www.coderblog.cn/tags#SBT" title="Pages tagged SBT" class="tag"><span class="term">SBT</span></a><a href="http://www.coderblog.cn/tags#Nexus" title="Pages tagged Nexus" class="tag"><span class="term">Nexus</span></a><a href="http://www.coderblog.cn/tags#Scala" title="Pages tagged Scala" class="tag"><span class="term">Scala</span></a></span>
+        
+        <span class="author vcard"><span class="fn">homeway88</span></span>
+        <div class="social-share">
+  <ul class="socialcount socialcount-small inline-list">
+    <li class="facebook"><a href="https://www.facebook.com/sharer/sharer.php?u=http://www.coderblog.cn/server/building-maven-and-sbt-repository-using-nexus-3.0.0/" title="Share on Facebook"><span class="count"><i class="fa fa-facebook-square"></i> Like</span></a></li>
+    <li class="twitter"><a href="https://twitter.com/intent/tweet?text=http://www.coderblog.cn/server/building-maven-and-sbt-repository-using-nexus-3.0.0/" title="Share on Twitter"><span class="count"><i class="fa fa-twitter-square"></i> Tweet</span></a></li>
+    <li class="googleplus"><a href="https://plus.google.com/share?url=http://www.coderblog.cn/server/building-maven-and-sbt-repository-using-nexus-3.0.0/" title="Share on Google Plus"><span class="count"><i class="fa fa-google-plus-square"></i> +1</span></a></li>
+  </ul>
+</div><!-- /.social-share -->
+
+      </footer>
+
+      <!-- 多说评论框 start -->
+      <div class="ds-thread" data-thread-key="/server/building-maven-and-sbt-repository-using-nexus-3.0.0" data-title="利用Nexus 3.0.0搭建Maven与SBT私服仓库" data-url="http://www.coderblog.cn/server/building-maven-and-sbt-repository-using-nexus-3.0.0/"></div>
+      <!-- 多说评论框 end -->
+      <!-- 多说公共JS代码 start (一个网页只需插入一次) -->
+      <script type="text/javascript">
+      var duoshuoQuery = {short_name:"coderblog"};
+        (function() {
+          var ds = document.createElement('script');
+          ds.type = 'text/javascript';ds.async = true;
+          ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+          ds.charset = 'UTF-8';
+          (document.getElementsByTagName('head')[0] 
+           || document.getElementsByTagName('body')[0]).appendChild(ds);
+        })();
+        </script>
+      <!-- 多说公共JS代码 end -->
+    </div><!-- /.entry-content -->
+    
+
+    <div class="read-more">
+  <div class="read-more-header">
+    <a href="http://www.coderblog.cn" class="read-more-btn">About the Author</a>
+  </div><!-- /.read-more-header -->
+  <div class="read-more-content author-info">
+    <h3>homeway88</h3>
+    <div class="author-container">
+      <img class="author-img" src="http://www.coderblog.cn/images/avatar.jpg" alt="homeway88" />
+      <div class="author-bio">生命不息，编程不止</div>
+    </div>
+    <div class="author-share">
+      <ul class="list-inline social-buttons">
+        
+          <li><a href="https://github.com/homeway88" target="_blank"><i class="fa fa-github fa-fw"></i></a></li>
+        
+          <li><a href="https://br.linkedin.com/in/aronbordin" target="_blank"><i class="fa fa-linkedin fa-fw"></i></a></li>
+        
+      </ul>
+      
+        <a aria-label="Follow @homeway88 on GitHub" data-style="mega" href="https://github.com/homeway88" class="github-button">Follow @homeway88</a>
+      
+      <br>
+      
+        <a href="https://twitter.com/homeway88" class="twitter-follow-button" data-show-count="false" data-size="large">Follow @homeway88</a>
+      
+    </div>
+  </div>
+</div>
+
+    
+    <div class="read-more">
+  
+    <div class="read-more-header">
+      <a href="http://www.coderblog.cn/scala/string-manipulation-and-interpolation-in-scala/" class="read-more-btn">Read More</a>
+    </div><!-- /.read-more-header -->
+    <div class="read-more-content">
+      <h3><a href="http://www.coderblog.cn/scala/string-manipulation-and-interpolation-in-scala/" title="Scala中的字符串操作与自定义扩展">Scala中的字符串操作与自定义扩展</a></h3>
+      <p>Scala中的String本质上只是java.lang.String的一个引用，但是Scala通过StringOps和StringContext来扩展了String类型的操作。1. String的本质Scala中的String类型，只是java.lang.String类型的...&hellip; <a href="http://www.coderblog.cn/scala/string-manipulation-and-interpolation-in-scala/">Continue reading</a></p>
+    </div><!-- /.read-more-content -->
+  
+  <div class="read-more-list">
+    
+  </div><!-- /.read-more-list -->
+</div><!-- /.read-more -->
+  </article>
+</div><!-- /#main -->
+
+<script type="text/javascript" src="//cdn.bootcss.com/jquery/1.11.3/jquery.min.js"></script>
+<script type="text/javascript">window.jQuery || document.write('<script type="text/javascript" src="http://www.coderblog.cn/assets/js/vendor/jquery-1.9.1.min.js"><\/script>')</script>
+<script type="text/javascript" src="http://www.coderblog.cn/assets/js/scripts.min.js"></script>
+<script type="text/javascript" async defer id="github-bjs" src="https://buttons.github.io/buttons.js"></script>
+<script type="text/javascript">!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');</script>
+
+
+
+
+<script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "//hm.baidu.com/hm.js?bd13f227a0a1ccb2ff4b9f9ca805b95b";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+
+
+
+
+
+
+
+
+<div class="footer-wrapper">
+  <footer role="contentinfo">
+    <span>&copy; 2016 homeway88. </span>
+
+  </footer>
+</div><!-- /.footer-wrapper -->
+
+</body>
+</html>

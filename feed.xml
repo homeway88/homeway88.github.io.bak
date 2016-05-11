@@ -4,13 +4,321 @@
 <generator uri="https://github.com/mojombo/jekyll">Jekyll</generator>
 <link rel="self" type="application/atom+xml" href="http://www.coderblog.cn/feed.xml" />
 <link rel="alternate" type="text/html" href="http://www.coderblog.cn" />
-<updated>2016-04-30T02:54:08+08:00</updated>
+<updated>2016-05-12T02:48:41+08:00</updated>
 <id>http://www.coderblog.cn/</id>
 <author>
   <name>homeway88</name>
   <uri>http://www.coderblog.cn/</uri>
   <email>homeway88@qq.com</email>
 </author>
+
+
+<entry>
+  <title type="html"><![CDATA[利用Nexus 3.0.0搭建Maven与SBT私服仓库]]></title>
+ <link rel="alternate" type="text/html" href="http://www.coderblog.cn/server/building-maven-and-sbt-repository-using-nexus-3.0.0/" />
+  <id>http://www.coderblog.cn/server/building-maven-and-sbt-repository-using-nexus-3.0.0</id>
+  <published>2016-05-11T00:00:00+08:00</published>
+  <updated>2016-05-11T00:00:00+08:00</updated>
+  <author>
+    <name>homeway88</name>
+    <uri>http://www.coderblog.cn</uri>
+    <email>homeway88@qq.com</email>
+  </author>
+  <content type="html">
+    &lt;p&gt;Maven与SBT都是非常流行的Java、Scala工程的构建工具，构建工程时需要从中央仓库中下载相应的依赖包，此时下载速度往往决定了首次构建该工程的速度，由于我所在的公司对网络进行了限制，平均下载速度仅100kB/s不到，有时候构建大型工程时（如Play Framework工程），仅下载依赖就要耗费几个小时的时间，因此，我决定自行搭建私服仓库，优点如下：&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;避免重复下载，加快构建速度：对于同一个依赖包，首次引用时从中央仓库下载一次，并缓存在私服仓库中，其他人再次引用该依赖包时，只需要从私服仓库下载即可，内网速度非常快。&lt;/li&gt;
+  &lt;li&gt;部分服务器没有外网访问权限：对于一些内网中的生产服务器，由于安全考虑没有外网访问权限，但又需要进行工程构建时，可以配置其从内网中的私服仓库中下载。&lt;/li&gt;
+  &lt;li&gt;发布公司的内部模块：公司开发的内部模块，称为二方库，可以直接发布在私服仓库上，供公司内部共享使用，避免重复造轮子。
+&lt;img src=&quot;http://www.coderblog.cn/images/posts/proxy-cloud-setup.png&quot; alt=&quot;私服仓库架构&quot; /&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;!-- more --&gt;
+
+&lt;h2 id=&quot;nexus-300&quot;&gt;1. Nexus 3.0.0下载与安装&lt;/h2&gt;
+&lt;p&gt;构建私服仓库有几种解决方案：&lt;a href=&quot;http://archiva.apache.org/index.cgi&quot;&gt;Archiva&lt;/a&gt; 、&lt;a href=&quot;http://www.jfrog.com/home/v_artifactory_opensource_overview&quot;&gt;Artifactory&lt;/a&gt; 与 &lt;a href=&quot;http://www.sonatype.org/nexus/&quot;&gt;Nexus&lt;/a&gt;。由于Nexus功能强大，配置简单，并且有简单易用的UI界面，而且有免费的开源版本，因此这里选用Nexus作为私服仓库。&lt;/p&gt;
+
+&lt;h3 id=&quot;nexus-300-1&quot;&gt;1.1 Nexus 3.0.0下载&lt;/h3&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;官网地址：&lt;a href=&quot;http://www.sonatype.org/nexus/&quot;&gt;http://www.sonatype.org/nexus/&lt;/a&gt;,&lt;/li&gt;
+  &lt;li&gt;下载地址：&lt;a href=&quot;http://www.sonatype.com/download-oss-sonatype&quot;&gt;http://www.sonatype.com/download-oss-sonatype&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;下载 Nexus Repository Manager OSS 3.xx，按照服务器的平台选择对应的版本，这里是部署在Linux平台下，因此选择nexus-3.0.0-03-unix.tar.gz，OSS即Open Source Software，可以免费使用，注意3.xx版本需要JDK1.8版本以上才能运行&lt;/li&gt;
+  &lt;li&gt;将下载好的文件解压后，执行&lt;code&gt;bin/nexus start&lt;/code&gt;即可，注意不要使用root帐户启动，成功启动后便可通过&lt;a href=&quot;http://localhost:8081/&quot;&gt;http://localhost:8081/&lt;/a&gt;或者&lt;code&gt;http://服务器IP:8081/&lt;/code&gt;进行访问，界面如下：&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-bash&quot; data-lang=&quot;bash&quot;&gt;tar -xf nexus-3.0.0-03-unix.tar.gz
+&lt;span class=&quot;nb&quot;&gt;cd &lt;/span&gt;nexus-3.0.0-03
+./bin/nexus start&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;&lt;img src=&quot;http://www.coderblog.cn/images/posts/nexus-web-ui.png&quot; alt=&quot;Nexus界面&quot; /&gt;&lt;/p&gt;
+
+&lt;h3 id=&quot;nexus&quot;&gt;1.2 Nexus仓库配置&lt;/h3&gt;
+&lt;p&gt;Nexus仓库有以下几种类型：&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;&lt;code&gt;hosted&lt;/code&gt;，本地仓库，通常我们会部署自己的构件到这一类型的仓库,比如公司的第二方库。&lt;/li&gt;
+  &lt;li&gt;&lt;code&gt;proxy&lt;/code&gt;，代理仓库，它们被用来代理远程的公共仓库，如maven中央仓库。&lt;/li&gt;
+  &lt;li&gt;&lt;code&gt;group&lt;/code&gt;，仓库组，用来合并多个hosted/proxy仓库，当你的项目希望在多个repository使用资源时就不需要多次引用了，只需要引用一个group即可。&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;点击Nexus界面右上角的&lt;code&gt;Sign in&lt;/code&gt;按钮，默认用户名和密码为：&lt;code&gt;admin&lt;/code&gt;/&lt;code&gt;admin123&lt;/code&gt;。登录后可以对Nexus进行配置，登录后点击配置按钮，并进入到&lt;code&gt;repositories&lt;/code&gt;的管理界面，界面如下：&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;http://www.coderblog.cn/images/posts/nexus-repository-setup.png&quot; alt=&quot;Nexus仓库管理界面&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;默认已经添加了Maven的中央仓库，仓库地址为http://服务器IP:8081/repository/maven-public/ ，因此，我们只需要为SBT添加相应的仓库即可,点击&lt;code&gt;Create repository&lt;/code&gt;按钮,选择仓库类型为&lt;code&gt;maven2/proxy&lt;/code&gt;，然后填入仓库名称和URL，主要有以下两个仓库：&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;type-safe: &lt;a href=&quot;http://repo.typesafe.com/typesafe/ivy-releases/&quot;&gt;http://repo.typesafe.com/typesafe/ivy-releases/&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;sbt-plugin: &lt;a href=&quot;http://dl.bintray.com/sbt/sbt-plugin-releases/&quot;&gt;http://dl.bintray.com/sbt/sbt-plugin-releases/&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;创建该仓库后，可以将以上的两个仓库归入同一个组中，方法是点击&lt;code&gt;Create repository&lt;/code&gt;按钮，选择仓库类型为&lt;code&gt;maven2/group&lt;/code&gt;,命令该仓库为&lt;code&gt;ivy-releases&lt;/code&gt;并将以上两个仓库移入该分组中。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;http://www.coderblog.cn/images/posts/nexus-ivy-releases-group.png&quot; alt=&quot;Ivy-releases分组&quot; /&gt;&lt;/p&gt;
+
+&lt;h2 id=&quot;mavensbt&quot;&gt;2. Maven与SBT配置&lt;/h2&gt;
+
+&lt;p&gt;由于我的服务器域名为&lt;code&gt;nas.com&lt;/code&gt;，因此以下所有配置的服务器名均为&lt;code&gt;http://nas.com:8081/&lt;/code&gt;,实际使用的时候自行替换成服务器IP即可。&lt;/p&gt;
+
+&lt;h3 id=&quot;maven&quot;&gt;2.1 Maven配置&lt;/h3&gt;
+&lt;p&gt;找到maven的配置文件，一般路径为：&lt;code&gt;~/.m2/settings.xml&lt;/code&gt;，如果没有，则新建该文件，设置文件内容如下：&lt;/p&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-xml&quot; data-lang=&quot;xml&quot;&gt;&lt;span class=&quot;nt&quot;&gt;&amp;lt;settings&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;xmlns=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;http://maven.apache.org/SETTINGS/1.0.0&quot;&lt;/span&gt;
+         &lt;span class=&quot;na&quot;&gt;xmlns:xsi=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;http://www.w3.org/2001/XMLSchema-instance&quot;&lt;/span&gt;
+         &lt;span class=&quot;na&quot;&gt;xsi:schemaLocation=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;http://maven.apache.org/SETTINGS/1.0.0&lt;/span&gt;
+            &lt;span class=&quot;err&quot;&gt;http://maven.apache.org/xsd/settings-1.0.0.xsd&quot;&lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&amp;gt;&lt;/span&gt;
+    &lt;span class=&quot;nt&quot;&gt;&amp;lt;mirrors&amp;gt;&lt;/span&gt;
+	    &lt;span class=&quot;nt&quot;&gt;&amp;lt;mirror&amp;gt;&lt;/span&gt;
+			&lt;span class=&quot;nt&quot;&gt;&amp;lt;id&amp;gt;&lt;/span&gt;nexus&lt;span class=&quot;nt&quot;&gt;&amp;lt;/id&amp;gt;&lt;/span&gt;
+			&lt;span class=&quot;nt&quot;&gt;&amp;lt;mirrorOf&amp;gt;&lt;/span&gt;*&lt;span class=&quot;nt&quot;&gt;&amp;lt;/mirrorOf&amp;gt;&lt;/span&gt;
+			&lt;span class=&quot;nt&quot;&gt;&amp;lt;name&amp;gt;&lt;/span&gt;Nexus&lt;span class=&quot;nt&quot;&gt;&amp;lt;/name&amp;gt;&lt;/span&gt;
+			&lt;span class=&quot;nt&quot;&gt;&amp;lt;url&amp;gt;&lt;/span&gt;http://nas.com:8081/repository/maven-public/&lt;span class=&quot;nt&quot;&gt;&amp;lt;/url&amp;gt;&lt;/span&gt;
+		&lt;span class=&quot;nt&quot;&gt;&amp;lt;/mirror&amp;gt;&lt;/span&gt;
+	&lt;span class=&quot;nt&quot;&gt;&amp;lt;/mirrors&amp;gt;&lt;/span&gt;
+&lt;span class=&quot;nt&quot;&gt;&amp;lt;/settings&amp;gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;此时，可以通过建立Maven工程，并执行打包命令，看看所需依赖是否能从私服仓库正确下载。
+新建&lt;code&gt;pom.xml&lt;/code&gt;文件，内容如下：&lt;/p&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-xml&quot; data-lang=&quot;xml&quot;&gt;&lt;span class=&quot;cp&quot;&gt;&amp;lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&amp;gt;&lt;/span&gt;
+&lt;span class=&quot;nt&quot;&gt;&amp;lt;project&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;xmlns=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;http://maven.apache.org/POM/4.0.0&quot;&lt;/span&gt;
+         &lt;span class=&quot;na&quot;&gt;xmlns:xsi=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;http://www.w3.org/2001/XMLSchema-instance&quot;&lt;/span&gt;
+         &lt;span class=&quot;na&quot;&gt;xsi:schemaLocation=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd&quot;&lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&amp;gt;&lt;/span&gt;
+    &lt;span class=&quot;nt&quot;&gt;&amp;lt;modelVersion&amp;gt;&lt;/span&gt;4.0.0&lt;span class=&quot;nt&quot;&gt;&amp;lt;/modelVersion&amp;gt;&lt;/span&gt;
+
+    &lt;span class=&quot;nt&quot;&gt;&amp;lt;groupId&amp;gt;&lt;/span&gt;com.homeway&lt;span class=&quot;nt&quot;&gt;&amp;lt;/groupId&amp;gt;&lt;/span&gt;
+    &lt;span class=&quot;nt&quot;&gt;&amp;lt;artifactId&amp;gt;&lt;/span&gt;mvntest2&lt;span class=&quot;nt&quot;&gt;&amp;lt;/artifactId&amp;gt;&lt;/span&gt;
+    &lt;span class=&quot;nt&quot;&gt;&amp;lt;version&amp;gt;&lt;/span&gt;1.0-SNAPSHOT&lt;span class=&quot;nt&quot;&gt;&amp;lt;/version&amp;gt;&lt;/span&gt;
+
+    &lt;span class=&quot;nt&quot;&gt;&amp;lt;dependencies&amp;gt;&lt;/span&gt;
+        &lt;span class=&quot;nt&quot;&gt;&amp;lt;dependency&amp;gt;&lt;/span&gt;
+            &lt;span class=&quot;nt&quot;&gt;&amp;lt;groupId&amp;gt;&lt;/span&gt;junit&lt;span class=&quot;nt&quot;&gt;&amp;lt;/groupId&amp;gt;&lt;/span&gt;
+            &lt;span class=&quot;nt&quot;&gt;&amp;lt;artifactId&amp;gt;&lt;/span&gt;junit&lt;span class=&quot;nt&quot;&gt;&amp;lt;/artifactId&amp;gt;&lt;/span&gt;
+            &lt;span class=&quot;nt&quot;&gt;&amp;lt;version&amp;gt;&lt;/span&gt;4.11&lt;span class=&quot;nt&quot;&gt;&amp;lt;/version&amp;gt;&lt;/span&gt;
+        &lt;span class=&quot;nt&quot;&gt;&amp;lt;/dependency&amp;gt;&lt;/span&gt;
+    &lt;span class=&quot;nt&quot;&gt;&amp;lt;/dependencies&amp;gt;&lt;/span&gt;
+
+&lt;span class=&quot;nt&quot;&gt;&amp;lt;/project&amp;gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;并执行&lt;code&gt;mvn package&lt;/code&gt;命令，如果可以看到以下输出，则证明此私服仓库已经正常工作。&lt;/p&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-bash&quot; data-lang=&quot;bash&quot;&gt;&lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;INFO] Scanning &lt;span class=&quot;k&quot;&gt;for &lt;/span&gt;projects...
+&lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;INFO]
+&lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;INFO] ------------------------------------------------------------------------
+&lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;INFO] Building mvntest2 1.0-SNAPSHOT
+&lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;INFO] ------------------------------------------------------------------------
+Downloading: http://nas.com:8081/repository/maven-public/org/apache/maven/plugins/maven-resources-plugin/2.3/maven-resources-plugin-2.3.pom
+Downloaded: http://nas.com:8081/repository/maven-public/org/apache/maven/plugins/maven-resources-plugin/2.3/maven-resources-plugin-2.3.pom &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;5 KB at 0.9 KB/sec&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
+Downloading: http://nas.com:8081/repository/maven-public/org/apache/maven/plugins/maven-plugins/12/maven-plugins-12.pom
+Downloaded: http://nas.com:8081/repository/maven-public/org/apache/maven/plugins/maven-plugins/12/maven-plugins-12.pom &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;0 B at 0.0 KB/sec&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
+Downloading: http://nas.com:8081/repository/maven-public/com/google/google/1/google-1.pom
+Downloaded: http://nas.com:8081/repository/maven-public/com/google/google/1/google-1.pom &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;0 B at 0.0 KB/sec&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
+Downloading: http://nas.com:8081/repository/maven-public/junit/junit/3.8.2/junit-3.8.2.pom
+Downloaded: http://nas.com:8081/repository/maven-public/junit/junit/3.8.2/junit-3.8.2.pom &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;0 B at 0.0 KB/sec&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
+.
+.
+.
+&lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;WARNING] JAR will be empty - no content was marked &lt;span class=&quot;k&quot;&gt;for &lt;/span&gt;inclusion!
+&lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;INFO] Building jar: /home/homeway/MvnTest/target/mvntest2-1.0-SNAPSHOT.jar
+&lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;INFO] ------------------------------------------------------------------------
+&lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;INFO] BUILD SUCCESS
+&lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;INFO] ------------------------------------------------------------------------
+&lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;INFO] Total &lt;span class=&quot;nb&quot;&gt;time&lt;/span&gt;: 03:30 min
+&lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;INFO] Finished at: 2016-04-30T07:35:45+08:00
+&lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;INFO] Final Memory: 10M/26M
+&lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;INFO] ------------------------------------------------------------------------&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;h3 id=&quot;sbt&quot;&gt;2.2 SBT配置&lt;/h3&gt;
+&lt;p&gt;SBT的依赖管理是基于Ivy，但是也可以使用Maven进行包依赖管理，因此需要分别配置;
+找到SBT的仓库配置文件，一般路径如为：&lt;code&gt;~/.sbt/repositories&lt;/code&gt;，如果没有，则新建一个，并设置内容如下：&lt;/p&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-yaml&quot; data-lang=&quot;yaml&quot;&gt;&lt;span class=&quot;pi&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;repositories&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;]&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;
+&lt;/span&gt;
+  &lt;span class=&quot;s&quot;&gt;local&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;
+&lt;/span&gt;
+  &lt;span class=&quot;s&quot;&gt;my-ivy-proxy-releases&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;http://nas.com:8081/repository/ivy-releases/, [organization]/[module]/(scala_[scalaVersion]/)(sbt_[sbtVersion]/)[revision]/[type]s/[artifact](-[classifier]).[ext]&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;
+&lt;/span&gt;
+  &lt;span class=&quot;s&quot;&gt;my-maven-proxy-releases&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;http://nas.com:8081/repository/maven-public/&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;此时，新建SBT工程进行测试，新建&lt;code&gt;build.sbt&lt;/code&gt;文件，内容如下：&lt;/p&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-scala&quot; data-lang=&quot;scala&quot;&gt;&lt;span class=&quot;n&quot;&gt;name&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;:=&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;SbtTest2&quot;&lt;/span&gt;
+
+&lt;span class=&quot;n&quot;&gt;version&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;:=&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;1.0&quot;&lt;/span&gt;
+
+&lt;span class=&quot;n&quot;&gt;scalaVersion&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;:=&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;2.11.8&quot;&lt;/span&gt;
+
+&lt;span class=&quot;n&quot;&gt;libraryDependencies&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+=&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;org.apache.kafka&quot;&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;%%&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;kafka&quot;&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;%&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;0.9.0.0&quot;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;并执行&lt;code&gt;sbt package&lt;/code&gt;命令(有时需要增加&lt;code&gt;-Dsbt.override.build.repos=true&lt;/code&gt;参数)，如果可以看到以下输出，则证明此私服仓库已经正常工作。&lt;/p&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-bash&quot; data-lang=&quot;bash&quot;&gt;&lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;info] Set current project to SbtTest2 &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;in &lt;/span&gt;build file:/home/homeway/SbtTest/&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;info] Updating &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;file:/home/homeway/SbtTest/&lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;sbttest...
+&lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;info] Resolving jline#jline;2.12.1 ...
+&lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;info] downloading http://nas.com:8081/repository/maven-public/org/scala-lang/scala-library/2.11.8/scala-library-2.11.8.jar ...
+&lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;info]  &lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;SUCCESSFUL &lt;span class=&quot;o&quot;&gt;]&lt;/span&gt; org.scala-lang#scala-library;2.11.8!scala-library.jar &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;2908ms&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;info] downloading http://nas.com:8081/repository/maven-public/org/apache/kafka/kafka_2.11/0.9.0.0/kafka_2.11-0.9.0.0.jar ...
+&lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;info]  &lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;SUCCESSFUL &lt;span class=&quot;o&quot;&gt;]&lt;/span&gt; org.apache.kafka#kafka_2.11;0.9.0.0!kafka_2.11.jar &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;276ms&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;info] downloading http://nas.com:8081/repository/maven-public/com/101tec/zkclient/0.7/zkclient-0.7.jar ...
+&lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;info]  &lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;SUCCESSFUL &lt;span class=&quot;o&quot;&gt;]&lt;/span&gt; com.101tec#zkclient;0.7!zkclient.jar &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;4922ms&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;info] downloading http://nas.com:8081/repository/maven-public/com/yammer/metrics/metrics-core/2.2.0/metrics-core-2.2.0.jar ...
+.
+.
+.
+&lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;success] Total &lt;span class=&quot;nb&quot;&gt;time&lt;/span&gt;: 1 s, completed 2016-5-12 15:17:12&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;h2 id=&quot;section&quot;&gt;3. 二方库发布&lt;/h2&gt;
+&lt;p&gt;为了在公司内部共享一些功能模块，我们需要将工程打包后发布到私服仓库中，以便其他团队的人员进行使用。利用&lt;code&gt;mvn deploy&lt;/code&gt;与&lt;code&gt;sbt publish&lt;/code&gt;命令，可以帮助我们将完成工程构建与发布的功能，只需要添加相关的仓库设置即可。&lt;/p&gt;
+
+&lt;h3 id=&quot;maven-1&quot;&gt;3.1 Maven发布&lt;/h3&gt;
+&lt;p&gt;首先，需要在&lt;code&gt;~/.m2/settings.xml&lt;/code&gt;中增加发布时的用户认证参数，修改该文件后内容如下：&lt;/p&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-xml&quot; data-lang=&quot;xml&quot;&gt;&lt;span class=&quot;nt&quot;&gt;&amp;lt;settings&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;xmlns=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;http://maven.apache.org/SETTINGS/1.0.0&quot;&lt;/span&gt;
+         &lt;span class=&quot;na&quot;&gt;xmlns:xsi=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;http://www.w3.org/2001/XMLSchema-instance&quot;&lt;/span&gt;
+         &lt;span class=&quot;na&quot;&gt;xsi:schemaLocation=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;http://maven.apache.org/SETTINGS/1.0.0&lt;/span&gt;
+            &lt;span class=&quot;err&quot;&gt;http://maven.apache.org/xsd/settings-1.0.0.xsd&quot;&lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&amp;gt;&lt;/span&gt;
+    &lt;span class=&quot;nt&quot;&gt;&amp;lt;mirrors&amp;gt;&lt;/span&gt;
+      &lt;span class=&quot;nt&quot;&gt;&amp;lt;mirror&amp;gt;&lt;/span&gt;
+      &lt;span class=&quot;nt&quot;&gt;&amp;lt;id&amp;gt;&lt;/span&gt;nexus&lt;span class=&quot;nt&quot;&gt;&amp;lt;/id&amp;gt;&lt;/span&gt;
+      &lt;span class=&quot;nt&quot;&gt;&amp;lt;mirrorOf&amp;gt;&lt;/span&gt;*&lt;span class=&quot;nt&quot;&gt;&amp;lt;/mirrorOf&amp;gt;&lt;/span&gt;
+      &lt;span class=&quot;nt&quot;&gt;&amp;lt;name&amp;gt;&lt;/span&gt;Nexus&lt;span class=&quot;nt&quot;&gt;&amp;lt;/name&amp;gt;&lt;/span&gt;
+      &lt;span class=&quot;nt&quot;&gt;&amp;lt;url&amp;gt;&lt;/span&gt;http://nas.com:8081/repository/maven-public/&lt;span class=&quot;nt&quot;&gt;&amp;lt;/url&amp;gt;&lt;/span&gt;
+    &lt;span class=&quot;nt&quot;&gt;&amp;lt;/mirror&amp;gt;&lt;/span&gt;
+  &lt;span class=&quot;nt&quot;&gt;&amp;lt;/mirrors&amp;gt;&lt;/span&gt;
+  &lt;span class=&quot;nt&quot;&gt;&amp;lt;servers&amp;gt;&lt;/span&gt;
+    &lt;span class=&quot;nt&quot;&gt;&amp;lt;server&amp;gt;&lt;/span&gt;
+      &lt;span class=&quot;nt&quot;&gt;&amp;lt;id&amp;gt;&lt;/span&gt;maven-releases&lt;span class=&quot;nt&quot;&gt;&amp;lt;/id&amp;gt;&lt;/span&gt;
+      &lt;span class=&quot;nt&quot;&gt;&amp;lt;username&amp;gt;&lt;/span&gt;admin&lt;span class=&quot;nt&quot;&gt;&amp;lt;/username&amp;gt;&lt;/span&gt;
+      &lt;span class=&quot;nt&quot;&gt;&amp;lt;password&amp;gt;&lt;/span&gt;admin123&lt;span class=&quot;nt&quot;&gt;&amp;lt;/password&amp;gt;&lt;/span&gt;
+    &lt;span class=&quot;nt&quot;&gt;&amp;lt;/server&amp;gt;&lt;/span&gt;
+    &lt;span class=&quot;nt&quot;&gt;&amp;lt;server&amp;gt;&lt;/span&gt;
+      &lt;span class=&quot;nt&quot;&gt;&amp;lt;id&amp;gt;&lt;/span&gt;maven-snapshots&lt;span class=&quot;nt&quot;&gt;&amp;lt;/id&amp;gt;&lt;/span&gt;
+      &lt;span class=&quot;nt&quot;&gt;&amp;lt;username&amp;gt;&lt;/span&gt;admin&lt;span class=&quot;nt&quot;&gt;&amp;lt;/username&amp;gt;&lt;/span&gt;
+      &lt;span class=&quot;nt&quot;&gt;&amp;lt;password&amp;gt;&lt;/span&gt;admin123&lt;span class=&quot;nt&quot;&gt;&amp;lt;/password&amp;gt;&lt;/span&gt;
+    &lt;span class=&quot;nt&quot;&gt;&amp;lt;/server&amp;gt;&lt;/span&gt;
+  &lt;span class=&quot;nt&quot;&gt;&amp;lt;/servers&amp;gt;&lt;/span&gt;
+&lt;span class=&quot;nt&quot;&gt;&amp;lt;/settings&amp;gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;其次，需要在项目的&lt;code&gt;pom.xml&lt;/code&gt;文件中增加发布仓库的位置，修改后的文件内容如下：&lt;/p&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-xml&quot; data-lang=&quot;xml&quot;&gt;&lt;span class=&quot;cp&quot;&gt;&amp;lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&amp;gt;&lt;/span&gt;
+&lt;span class=&quot;nt&quot;&gt;&amp;lt;project&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;xmlns=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;http://maven.apache.org/POM/4.0.0&quot;&lt;/span&gt;
+         &lt;span class=&quot;na&quot;&gt;xmlns:xsi=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;http://www.w3.org/2001/XMLSchema-instance&quot;&lt;/span&gt;
+         &lt;span class=&quot;na&quot;&gt;xsi:schemaLocation=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd&quot;&lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&amp;gt;&lt;/span&gt;
+    &lt;span class=&quot;nt&quot;&gt;&amp;lt;modelVersion&amp;gt;&lt;/span&gt;4.0.0&lt;span class=&quot;nt&quot;&gt;&amp;lt;/modelVersion&amp;gt;&lt;/span&gt;
+
+    &lt;span class=&quot;nt&quot;&gt;&amp;lt;groupId&amp;gt;&lt;/span&gt;com.homeway&lt;span class=&quot;nt&quot;&gt;&amp;lt;/groupId&amp;gt;&lt;/span&gt;
+    &lt;span class=&quot;nt&quot;&gt;&amp;lt;artifactId&amp;gt;&lt;/span&gt;mvntest2&lt;span class=&quot;nt&quot;&gt;&amp;lt;/artifactId&amp;gt;&lt;/span&gt;
+    &lt;span class=&quot;nt&quot;&gt;&amp;lt;version&amp;gt;&lt;/span&gt;1.0-SNAPSHOT&lt;span class=&quot;nt&quot;&gt;&amp;lt;/version&amp;gt;&lt;/span&gt;
+
+    &lt;span class=&quot;nt&quot;&gt;&amp;lt;dependencies&amp;gt;&lt;/span&gt;
+        &lt;span class=&quot;nt&quot;&gt;&amp;lt;dependency&amp;gt;&lt;/span&gt;
+            &lt;span class=&quot;nt&quot;&gt;&amp;lt;groupId&amp;gt;&lt;/span&gt;junit&lt;span class=&quot;nt&quot;&gt;&amp;lt;/groupId&amp;gt;&lt;/span&gt;
+            &lt;span class=&quot;nt&quot;&gt;&amp;lt;artifactId&amp;gt;&lt;/span&gt;junit&lt;span class=&quot;nt&quot;&gt;&amp;lt;/artifactId&amp;gt;&lt;/span&gt;
+            &lt;span class=&quot;nt&quot;&gt;&amp;lt;version&amp;gt;&lt;/span&gt;4.11&lt;span class=&quot;nt&quot;&gt;&amp;lt;/version&amp;gt;&lt;/span&gt;
+        &lt;span class=&quot;nt&quot;&gt;&amp;lt;/dependency&amp;gt;&lt;/span&gt;
+    &lt;span class=&quot;nt&quot;&gt;&amp;lt;/dependencies&amp;gt;&lt;/span&gt;
+    &lt;span class=&quot;nt&quot;&gt;&amp;lt;distributionManagement&amp;gt;&lt;/span&gt;
+        &lt;span class=&quot;nt&quot;&gt;&amp;lt;repository&amp;gt;&lt;/span&gt;
+            &lt;span class=&quot;nt&quot;&gt;&amp;lt;id&amp;gt;&lt;/span&gt;maven-releases&lt;span class=&quot;nt&quot;&gt;&amp;lt;/id&amp;gt;&lt;/span&gt;
+            &lt;span class=&quot;nt&quot;&gt;&amp;lt;url&amp;gt;&lt;/span&gt;http://nas.com:8081/repository/maven-releases/&lt;span class=&quot;nt&quot;&gt;&amp;lt;/url&amp;gt;&lt;/span&gt;
+        &lt;span class=&quot;nt&quot;&gt;&amp;lt;/repository&amp;gt;&lt;/span&gt;
+        &lt;span class=&quot;nt&quot;&gt;&amp;lt;snapshotRepository&amp;gt;&lt;/span&gt;
+            &lt;span class=&quot;nt&quot;&gt;&amp;lt;id&amp;gt;&lt;/span&gt;maven-snapshots&lt;span class=&quot;nt&quot;&gt;&amp;lt;/id&amp;gt;&lt;/span&gt;
+            &lt;span class=&quot;nt&quot;&gt;&amp;lt;url&amp;gt;&lt;/span&gt;http://nas.com:8081/repository/maven-snapshots/&lt;span class=&quot;nt&quot;&gt;&amp;lt;/url&amp;gt;&lt;/span&gt;
+        &lt;span class=&quot;nt&quot;&gt;&amp;lt;/snapshotRepository&amp;gt;&lt;/span&gt;
+    &lt;span class=&quot;nt&quot;&gt;&amp;lt;/distributionManagement&amp;gt;&lt;/span&gt;
+
+&lt;span class=&quot;nt&quot;&gt;&amp;lt;/project&amp;gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;之后，执行&lt;code&gt;mvn deploy&lt;/code&gt;命令，即可将工程发布到对应的仓库中。&lt;/p&gt;
+
+&lt;h3 id=&quot;sbt-1&quot;&gt;3.2 SBT发布&lt;/h3&gt;
+&lt;p&gt;SBT发布比较麻烦，利用原生的&lt;code&gt;sbt publish&lt;/code&gt;命令，无论怎么设置都没法通过用户认证，后面通过搜索，使用&lt;code&gt;aether deploy&lt;/code&gt;插件，便可以完成认证过程，方法如下：&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;新增用户认证参数文件：`~/.sbt/.credentials”,内容如下&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-bash&quot; data-lang=&quot;bash&quot;&gt;&lt;span class=&quot;nv&quot;&gt;realm&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;Some Nexus Repository Manager
+&lt;span class=&quot;nv&quot;&gt;host&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;nas.com
+&lt;span class=&quot;nv&quot;&gt;user&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;admin
+&lt;span class=&quot;nv&quot;&gt;password&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;admin123&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;在工程设置文件中添加发布仓库设置，修改&lt;code&gt;build.sbt&lt;/code&gt;,内容如下：&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-bash&quot; data-lang=&quot;bash&quot;&gt;name :&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;SbtTest2&quot;&lt;/span&gt;
+
+version :&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;1.0-SNAPSHOT&quot;&lt;/span&gt;
+
+scalaVersion :&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;2.11.8&quot;&lt;/span&gt;
+
+organization :&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;com.homeway&quot;&lt;/span&gt;
+
+libraryDependencies +&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;org.apache.kafka&quot;&lt;/span&gt; %% &lt;span class=&quot;s2&quot;&gt;&quot;kafka&quot;&lt;/span&gt; % &lt;span class=&quot;s2&quot;&gt;&quot;0.9.0.0&quot;&lt;/span&gt;
+
+credentials +&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; Credentials&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;Path.userHome / &lt;span class=&quot;s2&quot;&gt;&quot;.sbt&quot;&lt;/span&gt; / &lt;span class=&quot;s2&quot;&gt;&quot;.credentials&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
+
+publishTo &amp;lt;&amp;lt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;version&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt; apply &lt;span class=&quot;o&quot;&gt;{(&lt;/span&gt;v: String&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&amp;gt;
+  &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;v.endsWith&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;SNAPSHOT&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;))&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
+    Some&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;maven-snapshots&quot;&lt;/span&gt; at &lt;span class=&quot;s2&quot;&gt;&quot;http://nas.com:8081/repository/maven-snapshots/&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
+  &lt;span class=&quot;o&quot;&gt;}&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;else&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
+    Some&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;maven-releases&quot;&lt;/span&gt; at &lt;span class=&quot;s2&quot;&gt;&quot;http://nas.com:8081/repository/maven-releases/&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
+  &lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
+&lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;添加&lt;code&gt;aether deploy&lt;/code&gt;插件，即修改&lt;code&gt;project/plugins.sbt&lt;/code&gt;，内容如下：&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-bash&quot; data-lang=&quot;bash&quot;&gt;addSbtPlugin&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;no.arktekk.sbt&quot;&lt;/span&gt; % &lt;span class=&quot;s2&quot;&gt;&quot;aether-deploy&quot;&lt;/span&gt; % &lt;span class=&quot;s2&quot;&gt;&quot;0.17&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;执行&lt;code&gt;sbt aether-deploy&lt;/code&gt;命令，即可将工程发布到对应的仓库中。&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;发布后便可以在Nexus中查询到对应的模块，并且可以在其他工程中进行引用。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;http://www.coderblog.cn/images/posts/maven-sbt-publish-to-nexus.png&quot; alt=&quot;发布结果&quot; /&gt;&lt;/p&gt;
+
+&lt;h2 id=&quot;section-1&quot;&gt;4. 总结&lt;/h2&gt;
+&lt;p&gt;利用Nexus搭建Maven与SBT私服仓库，不仅可以实现工程的快速构建和公司内部的二方库共享，利用相关的插件，还能够实现版本控制、自动化打包、自动化部署等功能，是构建智能化的开发环境的必备选择。&lt;/p&gt;
+
+&lt;h2 id=&quot;section-2&quot;&gt;参考资料&lt;/h2&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;&lt;a href=&quot;https://books.sonatype.com/nexus-book/3.0/reference/admin.html#_repository_management_example&quot;&gt;Nexus Repository Manager 3.0&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;http://www.scala-sbt.org/release/docs/Proxy-Repositories.html&quot;&gt;SBT Proxy Repository&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;http://www.scala-sbt.org/0.13/docs/Publishing.html&quot;&gt;SBT Publishing&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+    &lt;p&gt;&lt;a href=&quot;http://www.coderblog.cn/server/building-maven-and-sbt-repository-using-nexus-3.0.0/&quot;&gt;利用Nexus 3.0.0搭建Maven与SBT私服仓库&lt;/a&gt; was originally published by homeway88 at &lt;a href=&quot;http://www.coderblog.cn&quot;&gt;Homeway's Blog&lt;/a&gt; on May 11, 2016.&lt;/p&gt;
+  </content>
+</entry>
 
 
 <entry>

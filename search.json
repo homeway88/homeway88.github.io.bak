@@ -1,6 +1,14 @@
 [
   
     {
+      "title"    : "利用Nexus 3.0.0搭建Maven与SBT私服仓库",
+      "category" : "Server",
+      "tags"     : "Server, Maven, SBT, Nexus, Scala",
+      "url"      : "http://www.coderblog.cn/server/building-maven-and-sbt-repository-using-nexus-3.0.0/",
+      "date"     : "2016-05-11 00:00:00 +0800"
+    } ,
+  
+    {
       "title"    : "Scala中的字符串操作与自定义扩展",
       "category" : "Scala",
       "tags"     : "Scala, 字符串",

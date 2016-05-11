@@ -101,6 +101,9 @@
                 
                   <li class="sub-item"><a href="/categories/#scala">scala</a></li>
               
+                
+                  <li class="sub-item"><a href="/categories/#server">server</a></li>
+              
             </ul>
           </li>
         
@@ -162,6 +165,9 @@
               
                 <li><a href="http://www.coderblog.cn/categories/#scala">scala</a></li>
             
+              
+                <li><a href="http://www.coderblog.cn/categories/#server">server</a></li>
+            
           </ul>
         </li>
       
@@ -180,6 +186,40 @@
 
 <div id="main" role="main">
   
+<article class="hentry">
+  <header>
+    
+    <div class="entry-meta">
+      <span class="entry-date date published updated"><time datetime="2016-05-11T00:00:00+08:00"><a href="http://www.coderblog.cn/server/building-maven-and-sbt-repository-using-nexus-3.0.0/">May 11, 2016</a></time></span><span class="author vcard"><span class="fn"><a href="http://www.coderblog.cn/about/" title="About homeway88">homeway88</a></span></span>
+      
+      <span class="entry-reading-time">
+        <i class="fa fa-clock-o"></i>
+        
+        Reading time ~2 minutes
+      </span><!-- /.entry-reading-time -->
+      
+    </div><!-- /.entry-meta -->
+    
+      <h1 class="entry-title"><a href="http://www.coderblog.cn/server/building-maven-and-sbt-repository-using-nexus-3.0.0/" rel="bookmark" title="利用Nexus 3.0.0搭建Maven与SBT私服仓库" itemprop="url">利用Nexus 3.0.0搭建Maven与SBT私服仓库</a></h1>
+    
+  </header>
+  <div class="entry-content">
+    
+    <p>Maven与SBT都是非常流行的Java、Scala工程的构建工具，构建工程时需要从中央仓库中下载相应的依赖包，此时下载速度往往决定了首次构建该工程的速度，由于我所在的公司对网络进行了限制，平均下载速度仅100kB/s不到，有时候构建大型工程时（如Play Framework工程），仅下载依赖就要耗费几个小时的时间，因此，我决定自行搭建私服仓库，优点如下：</p>
+
+<ul>
+  <li>避免重复下载，加快构建速度：对于同一个依赖包，首次引用时从中央仓库下载一次，并缓存在私服仓库中，其他人再次引用该依赖包时，只需要从私服仓库下载即可，内网速度非常快。</li>
+  <li>部分服务器没有外网访问权限：对于一些内网中的生产服务器，由于安全考虑没有外网访问权限，但又需要进行工程构建时，可以配置其从内网中的私服仓库中下载。</li>
+  <li>发布公司的内部模块：公司开发的内部模块，称为二方库，可以直接发布在私服仓库上，供公司内部共享使用，避免重复造轮子。
+<img src="http://www.coderblog.cn/images/posts/proxy-cloud-setup.png" alt="私服仓库架构" /></li>
+</ul>
+
+
+    <a href="http://www.coderblog.cn/server/building-maven-and-sbt-repository-using-nexus-3.0.0/" class="btn">Read more</a>
+    
+  </div><!-- /.entry-content -->
+</article><!-- /.hentry -->
+
 <article class="hentry">
   <header>
     
