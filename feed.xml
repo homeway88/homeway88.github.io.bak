@@ -4,7 +4,7 @@
 <generator uri="https://github.com/mojombo/jekyll">Jekyll</generator>
 <link rel="self" type="application/atom+xml" href="http://www.coderblog.cn/feed.xml" />
 <link rel="alternate" type="text/html" href="http://www.coderblog.cn" />
-<updated>2016-05-12T02:48:41+08:00</updated>
+<updated>2016-05-12T03:18:26+08:00</updated>
 <id>http://www.coderblog.cn/</id>
 <author>
   <name>homeway88</name>
@@ -80,7 +80,7 @@
 
 &lt;h2 id=&quot;mavensbt&quot;&gt;2. Maven与SBT配置&lt;/h2&gt;
 
-&lt;p&gt;由于我的服务器域名为&lt;code&gt;nas.com&lt;/code&gt;，因此以下所有配置的服务器名均为&lt;code&gt;http://nas.com:8081/&lt;/code&gt;,实际使用的时候自行替换成服务器IP即可。&lt;/p&gt;
+&lt;p&gt;由于我的服务器域名为&lt;code&gt;www.coderblog.cn&lt;/code&gt;，因此以下所有配置的服务器名均为&lt;code&gt;http://www.coderblog.cn:8081/&lt;/code&gt;,实际使用的时候自行替换成服务器IP即可。&lt;/p&gt;
 
 &lt;h3 id=&quot;maven&quot;&gt;2.1 Maven配置&lt;/h3&gt;
 &lt;p&gt;找到maven的配置文件，一般路径为：&lt;code&gt;~/.m2/settings.xml&lt;/code&gt;，如果没有，则新建该文件，设置文件内容如下：&lt;/p&gt;
@@ -94,7 +94,7 @@
 			&lt;span class=&quot;nt&quot;&gt;&amp;lt;id&amp;gt;&lt;/span&gt;nexus&lt;span class=&quot;nt&quot;&gt;&amp;lt;/id&amp;gt;&lt;/span&gt;
 			&lt;span class=&quot;nt&quot;&gt;&amp;lt;mirrorOf&amp;gt;&lt;/span&gt;*&lt;span class=&quot;nt&quot;&gt;&amp;lt;/mirrorOf&amp;gt;&lt;/span&gt;
 			&lt;span class=&quot;nt&quot;&gt;&amp;lt;name&amp;gt;&lt;/span&gt;Nexus&lt;span class=&quot;nt&quot;&gt;&amp;lt;/name&amp;gt;&lt;/span&gt;
-			&lt;span class=&quot;nt&quot;&gt;&amp;lt;url&amp;gt;&lt;/span&gt;http://nas.com:8081/repository/maven-public/&lt;span class=&quot;nt&quot;&gt;&amp;lt;/url&amp;gt;&lt;/span&gt;
+			&lt;span class=&quot;nt&quot;&gt;&amp;lt;url&amp;gt;&lt;/span&gt;http://www.coderblog.cn:8081/repository/maven-public/&lt;span class=&quot;nt&quot;&gt;&amp;lt;/url&amp;gt;&lt;/span&gt;
 		&lt;span class=&quot;nt&quot;&gt;&amp;lt;/mirror&amp;gt;&lt;/span&gt;
 	&lt;span class=&quot;nt&quot;&gt;&amp;lt;/mirrors&amp;gt;&lt;/span&gt;
 &lt;span class=&quot;nt&quot;&gt;&amp;lt;/settings&amp;gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
@@ -129,14 +129,14 @@
 &lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;INFO] ------------------------------------------------------------------------
 &lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;INFO] Building mvntest2 1.0-SNAPSHOT
 &lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;INFO] ------------------------------------------------------------------------
-Downloading: http://nas.com:8081/repository/maven-public/org/apache/maven/plugins/maven-resources-plugin/2.3/maven-resources-plugin-2.3.pom
-Downloaded: http://nas.com:8081/repository/maven-public/org/apache/maven/plugins/maven-resources-plugin/2.3/maven-resources-plugin-2.3.pom &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;5 KB at 0.9 KB/sec&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
-Downloading: http://nas.com:8081/repository/maven-public/org/apache/maven/plugins/maven-plugins/12/maven-plugins-12.pom
-Downloaded: http://nas.com:8081/repository/maven-public/org/apache/maven/plugins/maven-plugins/12/maven-plugins-12.pom &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;0 B at 0.0 KB/sec&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
-Downloading: http://nas.com:8081/repository/maven-public/com/google/google/1/google-1.pom
-Downloaded: http://nas.com:8081/repository/maven-public/com/google/google/1/google-1.pom &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;0 B at 0.0 KB/sec&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
-Downloading: http://nas.com:8081/repository/maven-public/junit/junit/3.8.2/junit-3.8.2.pom
-Downloaded: http://nas.com:8081/repository/maven-public/junit/junit/3.8.2/junit-3.8.2.pom &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;0 B at 0.0 KB/sec&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
+Downloading: http://www.coderblog.cn:8081/repository/maven-public/org/apache/maven/plugins/maven-resources-plugin/2.3/maven-resources-plugin-2.3.pom
+Downloaded: http://www.coderblog.cn:8081/repository/maven-public/org/apache/maven/plugins/maven-resources-plugin/2.3/maven-resources-plugin-2.3.pom &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;5 KB at 0.9 KB/sec&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
+Downloading: http://www.coderblog.cn:8081/repository/maven-public/org/apache/maven/plugins/maven-plugins/12/maven-plugins-12.pom
+Downloaded: http://www.coderblog.cn:8081/repository/maven-public/org/apache/maven/plugins/maven-plugins/12/maven-plugins-12.pom &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;0 B at 0.0 KB/sec&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
+Downloading: http://www.coderblog.cn:8081/repository/maven-public/com/google/google/1/google-1.pom
+Downloaded: http://www.coderblog.cn:8081/repository/maven-public/com/google/google/1/google-1.pom &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;0 B at 0.0 KB/sec&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
+Downloading: http://www.coderblog.cn:8081/repository/maven-public/junit/junit/3.8.2/junit-3.8.2.pom
+Downloaded: http://www.coderblog.cn:8081/repository/maven-public/junit/junit/3.8.2/junit-3.8.2.pom &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;0 B at 0.0 KB/sec&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
 .
 .
 .
@@ -158,9 +158,9 @@ Downloaded: http://nas.com:8081/repository/maven-public/junit/junit/3.8.2/junit-
 &lt;/span&gt;
   &lt;span class=&quot;s&quot;&gt;local&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;
 &lt;/span&gt;
-  &lt;span class=&quot;s&quot;&gt;my-ivy-proxy-releases&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;http://nas.com:8081/repository/ivy-releases/, [organization]/[module]/(scala_[scalaVersion]/)(sbt_[sbtVersion]/)[revision]/[type]s/[artifact](-[classifier]).[ext]&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;
+  &lt;span class=&quot;s&quot;&gt;my-ivy-proxy-releases&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;http://www.coderblog.cn:8081/repository/ivy-releases/, [organization]/[module]/(scala_[scalaVersion]/)(sbt_[sbtVersion]/)[revision]/[type]s/[artifact](-[classifier]).[ext]&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;
 &lt;/span&gt;
-  &lt;span class=&quot;s&quot;&gt;my-maven-proxy-releases&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;http://nas.com:8081/repository/maven-public/&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+  &lt;span class=&quot;s&quot;&gt;my-maven-proxy-releases&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;http://www.coderblog.cn:8081/repository/maven-public/&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 
 &lt;p&gt;此时，新建SBT工程进行测试，新建&lt;code&gt;build.sbt&lt;/code&gt;文件，内容如下：&lt;/p&gt;
 
@@ -177,13 +177,13 @@ Downloaded: http://nas.com:8081/repository/maven-public/junit/junit/3.8.2/junit-
 &lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-bash&quot; data-lang=&quot;bash&quot;&gt;&lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;info] Set current project to SbtTest2 &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;in &lt;/span&gt;build file:/home/homeway/SbtTest/&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
 &lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;info] Updating &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;file:/home/homeway/SbtTest/&lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;sbttest...
 &lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;info] Resolving jline#jline;2.12.1 ...
-&lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;info] downloading http://nas.com:8081/repository/maven-public/org/scala-lang/scala-library/2.11.8/scala-library-2.11.8.jar ...
+&lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;info] downloading http://www.coderblog.cn:8081/repository/maven-public/org/scala-lang/scala-library/2.11.8/scala-library-2.11.8.jar ...
 &lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;info]  &lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;SUCCESSFUL &lt;span class=&quot;o&quot;&gt;]&lt;/span&gt; org.scala-lang#scala-library;2.11.8!scala-library.jar &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;2908ms&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
-&lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;info] downloading http://nas.com:8081/repository/maven-public/org/apache/kafka/kafka_2.11/0.9.0.0/kafka_2.11-0.9.0.0.jar ...
+&lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;info] downloading http://www.coderblog.cn:8081/repository/maven-public/org/apache/kafka/kafka_2.11/0.9.0.0/kafka_2.11-0.9.0.0.jar ...
 &lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;info]  &lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;SUCCESSFUL &lt;span class=&quot;o&quot;&gt;]&lt;/span&gt; org.apache.kafka#kafka_2.11;0.9.0.0!kafka_2.11.jar &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;276ms&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
-&lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;info] downloading http://nas.com:8081/repository/maven-public/com/101tec/zkclient/0.7/zkclient-0.7.jar ...
+&lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;info] downloading http://www.coderblog.cn:8081/repository/maven-public/com/101tec/zkclient/0.7/zkclient-0.7.jar ...
 &lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;info]  &lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;SUCCESSFUL &lt;span class=&quot;o&quot;&gt;]&lt;/span&gt; com.101tec#zkclient;0.7!zkclient.jar &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;4922ms&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
-&lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;info] downloading http://nas.com:8081/repository/maven-public/com/yammer/metrics/metrics-core/2.2.0/metrics-core-2.2.0.jar ...
+&lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;info] downloading http://www.coderblog.cn:8081/repository/maven-public/com/yammer/metrics/metrics-core/2.2.0/metrics-core-2.2.0.jar ...
 .
 .
 .
@@ -204,7 +204,7 @@ Downloaded: http://nas.com:8081/repository/maven-public/junit/junit/3.8.2/junit-
       &lt;span class=&quot;nt&quot;&gt;&amp;lt;id&amp;gt;&lt;/span&gt;nexus&lt;span class=&quot;nt&quot;&gt;&amp;lt;/id&amp;gt;&lt;/span&gt;
       &lt;span class=&quot;nt&quot;&gt;&amp;lt;mirrorOf&amp;gt;&lt;/span&gt;*&lt;span class=&quot;nt&quot;&gt;&amp;lt;/mirrorOf&amp;gt;&lt;/span&gt;
       &lt;span class=&quot;nt&quot;&gt;&amp;lt;name&amp;gt;&lt;/span&gt;Nexus&lt;span class=&quot;nt&quot;&gt;&amp;lt;/name&amp;gt;&lt;/span&gt;
-      &lt;span class=&quot;nt&quot;&gt;&amp;lt;url&amp;gt;&lt;/span&gt;http://nas.com:8081/repository/maven-public/&lt;span class=&quot;nt&quot;&gt;&amp;lt;/url&amp;gt;&lt;/span&gt;
+      &lt;span class=&quot;nt&quot;&gt;&amp;lt;url&amp;gt;&lt;/span&gt;http://www.coderblog.cn:8081/repository/maven-public/&lt;span class=&quot;nt&quot;&gt;&amp;lt;/url&amp;gt;&lt;/span&gt;
     &lt;span class=&quot;nt&quot;&gt;&amp;lt;/mirror&amp;gt;&lt;/span&gt;
   &lt;span class=&quot;nt&quot;&gt;&amp;lt;/mirrors&amp;gt;&lt;/span&gt;
   &lt;span class=&quot;nt&quot;&gt;&amp;lt;servers&amp;gt;&lt;/span&gt;
@@ -243,11 +243,11 @@ Downloaded: http://nas.com:8081/repository/maven-public/junit/junit/3.8.2/junit-
     &lt;span class=&quot;nt&quot;&gt;&amp;lt;distributionManagement&amp;gt;&lt;/span&gt;
         &lt;span class=&quot;nt&quot;&gt;&amp;lt;repository&amp;gt;&lt;/span&gt;
             &lt;span class=&quot;nt&quot;&gt;&amp;lt;id&amp;gt;&lt;/span&gt;maven-releases&lt;span class=&quot;nt&quot;&gt;&amp;lt;/id&amp;gt;&lt;/span&gt;
-            &lt;span class=&quot;nt&quot;&gt;&amp;lt;url&amp;gt;&lt;/span&gt;http://nas.com:8081/repository/maven-releases/&lt;span class=&quot;nt&quot;&gt;&amp;lt;/url&amp;gt;&lt;/span&gt;
+            &lt;span class=&quot;nt&quot;&gt;&amp;lt;url&amp;gt;&lt;/span&gt;http://www.coderblog.cn:8081/repository/maven-releases/&lt;span class=&quot;nt&quot;&gt;&amp;lt;/url&amp;gt;&lt;/span&gt;
         &lt;span class=&quot;nt&quot;&gt;&amp;lt;/repository&amp;gt;&lt;/span&gt;
         &lt;span class=&quot;nt&quot;&gt;&amp;lt;snapshotRepository&amp;gt;&lt;/span&gt;
             &lt;span class=&quot;nt&quot;&gt;&amp;lt;id&amp;gt;&lt;/span&gt;maven-snapshots&lt;span class=&quot;nt&quot;&gt;&amp;lt;/id&amp;gt;&lt;/span&gt;
-            &lt;span class=&quot;nt&quot;&gt;&amp;lt;url&amp;gt;&lt;/span&gt;http://nas.com:8081/repository/maven-snapshots/&lt;span class=&quot;nt&quot;&gt;&amp;lt;/url&amp;gt;&lt;/span&gt;
+            &lt;span class=&quot;nt&quot;&gt;&amp;lt;url&amp;gt;&lt;/span&gt;http://www.coderblog.cn:8081/repository/maven-snapshots/&lt;span class=&quot;nt&quot;&gt;&amp;lt;/url&amp;gt;&lt;/span&gt;
         &lt;span class=&quot;nt&quot;&gt;&amp;lt;/snapshotRepository&amp;gt;&lt;/span&gt;
     &lt;span class=&quot;nt&quot;&gt;&amp;lt;/distributionManagement&amp;gt;&lt;/span&gt;
 
@@ -263,7 +263,7 @@ Downloaded: http://nas.com:8081/repository/maven-public/junit/junit/3.8.2/junit-
 &lt;/ul&gt;
 
 &lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-bash&quot; data-lang=&quot;bash&quot;&gt;&lt;span class=&quot;nv&quot;&gt;realm&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;Some Nexus Repository Manager
-&lt;span class=&quot;nv&quot;&gt;host&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;nas.com
+&lt;span class=&quot;nv&quot;&gt;host&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;www.coderblog.cn
 &lt;span class=&quot;nv&quot;&gt;user&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;admin
 &lt;span class=&quot;nv&quot;&gt;password&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;admin123&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 
@@ -285,9 +285,9 @@ credentials +&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; Credentials&lt;span 
 
 publishTo &amp;lt;&amp;lt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;version&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt; apply &lt;span class=&quot;o&quot;&gt;{(&lt;/span&gt;v: String&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&amp;gt;
   &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;v.endsWith&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;SNAPSHOT&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;))&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
-    Some&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;maven-snapshots&quot;&lt;/span&gt; at &lt;span class=&quot;s2&quot;&gt;&quot;http://nas.com:8081/repository/maven-snapshots/&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
+    Some&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;maven-snapshots&quot;&lt;/span&gt; at &lt;span class=&quot;s2&quot;&gt;&quot;http://www.coderblog.cn:8081/repository/maven-snapshots/&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
   &lt;span class=&quot;o&quot;&gt;}&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;else&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
-    Some&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;maven-releases&quot;&lt;/span&gt; at &lt;span class=&quot;s2&quot;&gt;&quot;http://nas.com:8081/repository/maven-releases/&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
+    Some&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;maven-releases&quot;&lt;/span&gt; at &lt;span class=&quot;s2&quot;&gt;&quot;http://www.coderblog.cn:8081/repository/maven-releases/&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
   &lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
 &lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 

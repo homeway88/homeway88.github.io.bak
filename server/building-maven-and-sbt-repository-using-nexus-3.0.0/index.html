@@ -246,7 +246,7 @@
 
 <h2 id="mavensbt">2. Maven与SBT配置</h2>
 
-<p>由于我的服务器域名为<code>nas.com</code>，因此以下所有配置的服务器名均为<code>http://nas.com:8081/</code>,实际使用的时候自行替换成服务器IP即可。</p>
+<p>由于我的服务器域名为<code>www.coderblog.cn</code>，因此以下所有配置的服务器名均为<code>http://www.coderblog.cn:8081/</code>,实际使用的时候自行替换成服务器IP即可。</p>
 
 <h3 id="maven">2.1 Maven配置</h3>
 <p>找到maven的配置文件，一般路径为：<code>~/.m2/settings.xml</code>，如果没有，则新建该文件，设置文件内容如下：</p>
@@ -260,7 +260,7 @@
 			<span class="nt">&lt;id&gt;</span>nexus<span class="nt">&lt;/id&gt;</span>
 			<span class="nt">&lt;mirrorOf&gt;</span>*<span class="nt">&lt;/mirrorOf&gt;</span>
 			<span class="nt">&lt;name&gt;</span>Nexus<span class="nt">&lt;/name&gt;</span>
-			<span class="nt">&lt;url&gt;</span>http://nas.com:8081/repository/maven-public/<span class="nt">&lt;/url&gt;</span>
+			<span class="nt">&lt;url&gt;</span>http://www.coderblog.cn:8081/repository/maven-public/<span class="nt">&lt;/url&gt;</span>
 		<span class="nt">&lt;/mirror&gt;</span>
 	<span class="nt">&lt;/mirrors&gt;</span>
 <span class="nt">&lt;/settings&gt;</span></code></pre></div>
@@ -295,14 +295,14 @@
 <span class="o">[</span>INFO] ------------------------------------------------------------------------
 <span class="o">[</span>INFO] Building mvntest2 1.0-SNAPSHOT
 <span class="o">[</span>INFO] ------------------------------------------------------------------------
-Downloading: http://nas.com:8081/repository/maven-public/org/apache/maven/plugins/maven-resources-plugin/2.3/maven-resources-plugin-2.3.pom
-Downloaded: http://nas.com:8081/repository/maven-public/org/apache/maven/plugins/maven-resources-plugin/2.3/maven-resources-plugin-2.3.pom <span class="o">(</span>5 KB at 0.9 KB/sec<span class="o">)</span>
-Downloading: http://nas.com:8081/repository/maven-public/org/apache/maven/plugins/maven-plugins/12/maven-plugins-12.pom
-Downloaded: http://nas.com:8081/repository/maven-public/org/apache/maven/plugins/maven-plugins/12/maven-plugins-12.pom <span class="o">(</span>0 B at 0.0 KB/sec<span class="o">)</span>
-Downloading: http://nas.com:8081/repository/maven-public/com/google/google/1/google-1.pom
-Downloaded: http://nas.com:8081/repository/maven-public/com/google/google/1/google-1.pom <span class="o">(</span>0 B at 0.0 KB/sec<span class="o">)</span>
-Downloading: http://nas.com:8081/repository/maven-public/junit/junit/3.8.2/junit-3.8.2.pom
-Downloaded: http://nas.com:8081/repository/maven-public/junit/junit/3.8.2/junit-3.8.2.pom <span class="o">(</span>0 B at 0.0 KB/sec<span class="o">)</span>
+Downloading: http://www.coderblog.cn:8081/repository/maven-public/org/apache/maven/plugins/maven-resources-plugin/2.3/maven-resources-plugin-2.3.pom
+Downloaded: http://www.coderblog.cn:8081/repository/maven-public/org/apache/maven/plugins/maven-resources-plugin/2.3/maven-resources-plugin-2.3.pom <span class="o">(</span>5 KB at 0.9 KB/sec<span class="o">)</span>
+Downloading: http://www.coderblog.cn:8081/repository/maven-public/org/apache/maven/plugins/maven-plugins/12/maven-plugins-12.pom
+Downloaded: http://www.coderblog.cn:8081/repository/maven-public/org/apache/maven/plugins/maven-plugins/12/maven-plugins-12.pom <span class="o">(</span>0 B at 0.0 KB/sec<span class="o">)</span>
+Downloading: http://www.coderblog.cn:8081/repository/maven-public/com/google/google/1/google-1.pom
+Downloaded: http://www.coderblog.cn:8081/repository/maven-public/com/google/google/1/google-1.pom <span class="o">(</span>0 B at 0.0 KB/sec<span class="o">)</span>
+Downloading: http://www.coderblog.cn:8081/repository/maven-public/junit/junit/3.8.2/junit-3.8.2.pom
+Downloaded: http://www.coderblog.cn:8081/repository/maven-public/junit/junit/3.8.2/junit-3.8.2.pom <span class="o">(</span>0 B at 0.0 KB/sec<span class="o">)</span>
 .
 .
 .
@@ -324,9 +324,9 @@ Downloaded: http://nas.com:8081/repository/maven-public/junit/junit/3.8.2/junit-
 </span>
   <span class="s">local</span><span class="err">
 </span>
-  <span class="s">my-ivy-proxy-releases</span><span class="pi">:</span> <span class="s">http://nas.com:8081/repository/ivy-releases/, [organization]/[module]/(scala_[scalaVersion]/)(sbt_[sbtVersion]/)[revision]/[type]s/[artifact](-[classifier]).[ext]</span><span class="err">
+  <span class="s">my-ivy-proxy-releases</span><span class="pi">:</span> <span class="s">http://www.coderblog.cn:8081/repository/ivy-releases/, [organization]/[module]/(scala_[scalaVersion]/)(sbt_[sbtVersion]/)[revision]/[type]s/[artifact](-[classifier]).[ext]</span><span class="err">
 </span>
-  <span class="s">my-maven-proxy-releases</span><span class="pi">:</span> <span class="s">http://nas.com:8081/repository/maven-public/</span></code></pre></div>
+  <span class="s">my-maven-proxy-releases</span><span class="pi">:</span> <span class="s">http://www.coderblog.cn:8081/repository/maven-public/</span></code></pre></div>
 
 <p>此时，新建SBT工程进行测试，新建<code>build.sbt</code>文件，内容如下：</p>
 
@@ -343,13 +343,13 @@ Downloaded: http://nas.com:8081/repository/maven-public/junit/junit/3.8.2/junit-
 <div class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="o">[</span>info] Set current project to SbtTest2 <span class="o">(</span><span class="k">in </span>build file:/home/homeway/SbtTest/<span class="o">)</span>
 <span class="o">[</span>info] Updating <span class="o">{</span>file:/home/homeway/SbtTest/<span class="o">}</span>sbttest...
 <span class="o">[</span>info] Resolving jline#jline;2.12.1 ...
-<span class="o">[</span>info] downloading http://nas.com:8081/repository/maven-public/org/scala-lang/scala-library/2.11.8/scala-library-2.11.8.jar ...
+<span class="o">[</span>info] downloading http://www.coderblog.cn:8081/repository/maven-public/org/scala-lang/scala-library/2.11.8/scala-library-2.11.8.jar ...
 <span class="o">[</span>info]  <span class="o">[</span>SUCCESSFUL <span class="o">]</span> org.scala-lang#scala-library;2.11.8!scala-library.jar <span class="o">(</span>2908ms<span class="o">)</span>
-<span class="o">[</span>info] downloading http://nas.com:8081/repository/maven-public/org/apache/kafka/kafka_2.11/0.9.0.0/kafka_2.11-0.9.0.0.jar ...
+<span class="o">[</span>info] downloading http://www.coderblog.cn:8081/repository/maven-public/org/apache/kafka/kafka_2.11/0.9.0.0/kafka_2.11-0.9.0.0.jar ...
 <span class="o">[</span>info]  <span class="o">[</span>SUCCESSFUL <span class="o">]</span> org.apache.kafka#kafka_2.11;0.9.0.0!kafka_2.11.jar <span class="o">(</span>276ms<span class="o">)</span>
-<span class="o">[</span>info] downloading http://nas.com:8081/repository/maven-public/com/101tec/zkclient/0.7/zkclient-0.7.jar ...
+<span class="o">[</span>info] downloading http://www.coderblog.cn:8081/repository/maven-public/com/101tec/zkclient/0.7/zkclient-0.7.jar ...
 <span class="o">[</span>info]  <span class="o">[</span>SUCCESSFUL <span class="o">]</span> com.101tec#zkclient;0.7!zkclient.jar <span class="o">(</span>4922ms<span class="o">)</span>
-<span class="o">[</span>info] downloading http://nas.com:8081/repository/maven-public/com/yammer/metrics/metrics-core/2.2.0/metrics-core-2.2.0.jar ...
+<span class="o">[</span>info] downloading http://www.coderblog.cn:8081/repository/maven-public/com/yammer/metrics/metrics-core/2.2.0/metrics-core-2.2.0.jar ...
 .
 .
 .
@@ -370,7 +370,7 @@ Downloaded: http://nas.com:8081/repository/maven-public/junit/junit/3.8.2/junit-
       <span class="nt">&lt;id&gt;</span>nexus<span class="nt">&lt;/id&gt;</span>
       <span class="nt">&lt;mirrorOf&gt;</span>*<span class="nt">&lt;/mirrorOf&gt;</span>
       <span class="nt">&lt;name&gt;</span>Nexus<span class="nt">&lt;/name&gt;</span>
-      <span class="nt">&lt;url&gt;</span>http://nas.com:8081/repository/maven-public/<span class="nt">&lt;/url&gt;</span>
+      <span class="nt">&lt;url&gt;</span>http://www.coderblog.cn:8081/repository/maven-public/<span class="nt">&lt;/url&gt;</span>
     <span class="nt">&lt;/mirror&gt;</span>
   <span class="nt">&lt;/mirrors&gt;</span>
   <span class="nt">&lt;servers&gt;</span>
@@ -409,11 +409,11 @@ Downloaded: http://nas.com:8081/repository/maven-public/junit/junit/3.8.2/junit-
     <span class="nt">&lt;distributionManagement&gt;</span>
         <span class="nt">&lt;repository&gt;</span>
             <span class="nt">&lt;id&gt;</span>maven-releases<span class="nt">&lt;/id&gt;</span>
-            <span class="nt">&lt;url&gt;</span>http://nas.com:8081/repository/maven-releases/<span class="nt">&lt;/url&gt;</span>
+            <span class="nt">&lt;url&gt;</span>http://www.coderblog.cn:8081/repository/maven-releases/<span class="nt">&lt;/url&gt;</span>
         <span class="nt">&lt;/repository&gt;</span>
         <span class="nt">&lt;snapshotRepository&gt;</span>
             <span class="nt">&lt;id&gt;</span>maven-snapshots<span class="nt">&lt;/id&gt;</span>
-            <span class="nt">&lt;url&gt;</span>http://nas.com:8081/repository/maven-snapshots/<span class="nt">&lt;/url&gt;</span>
+            <span class="nt">&lt;url&gt;</span>http://www.coderblog.cn:8081/repository/maven-snapshots/<span class="nt">&lt;/url&gt;</span>
         <span class="nt">&lt;/snapshotRepository&gt;</span>
     <span class="nt">&lt;/distributionManagement&gt;</span>
 
@@ -429,7 +429,7 @@ Downloaded: http://nas.com:8081/repository/maven-public/junit/junit/3.8.2/junit-
 </ul>
 
 <div class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="nv">realm</span><span class="o">=</span>Some Nexus Repository Manager
-<span class="nv">host</span><span class="o">=</span>nas.com
+<span class="nv">host</span><span class="o">=</span>www.coderblog.cn
 <span class="nv">user</span><span class="o">=</span>admin
 <span class="nv">password</span><span class="o">=</span>admin123</code></pre></div>
 
@@ -451,9 +451,9 @@ credentials +<span class="o">=</span> Credentials<span class="o">(</span>Path.us
 
 publishTo &lt;&lt;<span class="o">=</span> <span class="o">(</span>version<span class="o">)</span> apply <span class="o">{(</span>v: String<span class="o">)</span> <span class="o">=</span>&gt;
   <span class="k">if</span> <span class="o">(</span>v.endsWith<span class="o">(</span><span class="s2">"SNAPSHOT"</span><span class="o">))</span> <span class="o">{</span>
-    Some<span class="o">(</span><span class="s2">"maven-snapshots"</span> at <span class="s2">"http://nas.com:8081/repository/maven-snapshots/"</span><span class="o">)</span>
+    Some<span class="o">(</span><span class="s2">"maven-snapshots"</span> at <span class="s2">"http://www.coderblog.cn:8081/repository/maven-snapshots/"</span><span class="o">)</span>
   <span class="o">}</span> <span class="k">else</span> <span class="o">{</span>
-    Some<span class="o">(</span><span class="s2">"maven-releases"</span> at <span class="s2">"http://nas.com:8081/repository/maven-releases/"</span><span class="o">)</span>
+    Some<span class="o">(</span><span class="s2">"maven-releases"</span> at <span class="s2">"http://www.coderblog.cn:8081/repository/maven-releases/"</span><span class="o">)</span>
   <span class="o">}</span>
 <span class="o">}</span></code></pre></div>
 
